@@ -1,0 +1,114 @@
+version: '3.4'
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+
+
+services:
+  proxy:
+    logging: *default-logging
+    labels:
+      - "logging=true"
+    image: svercoutere/sirus-westtoer-proxy:0.0.2
+    restart: always
+    environment:
+      TARGET_API_URL: "http://resource"
+      SPARQL_API_URL: "http://database:8890/sparql"
+    ports:
+      - 80:80
+    networks:
+      - ldes
+
+  resource:
+    logging: *default-logging
+    labels:
+      - "logging=true"
+    image: svercoutere/sirus-mu-resources:0.0.1
+    links:
+      - database:database
+    volumes:
+      - ./config/resources:/config
+    restart: always
+    environment:
+      CACHE_CLEAR_PATH: "http://cache/.mu/clear-keys"
+    networks:
+      - ldes
+
+  ldio-workbench:
+    container_name: westtoer_ldes2triplestore_ldio-workbench
+    image: ldes/ldi-orchestrator:2.9.0-SNAPSHOT
+    volumes:
+      - ./ldio-ldes2triplestore.yml:/ldio/application.yml:ro
+    networks:
+      - ldes
+    depends_on:
+      curl-create-rdf4j-repository:
+        condition: "service_completed_successfully"
+      rdf4j-server:
+        condition: "service_healthy"
+
+  database:
+    image: tenforce/virtuoso:1.3.2-virtuoso7.2.5.1
+    environment:
+      SPARQL_UPDATE: "true"
+      DEFAULT_GRAPH: "http://mu.semte.ch/application"
+    volumes:
+      - ./data/db:/data
+      - ./config/virtuoso/virtuoso.ini:/data/virtuoso.ini
+    restart: always
+    networks:
+      - ldes
+
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8890/sparql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  rdf4j-server:
+    image: eclipse/rdf4j-workbench:latest
+    container_name: westtoer_ldes2triplestore_rdf4j
+    environment:
+      - "JAVA_OPTS=-Xms1g -Xmx4g"
+
+    networks:
+      - ldes
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/rdf4j-server/repositories || exit 1
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  curl-create-rdf4j-repository:
+    image: alpine/curl
+    container_name: curl-create-rdf4j-repository
+    restart: 'no'
+    depends_on:
+      rdf4j-server:
+        condition: "service_healthy"
+    command: |
+      curl -X PUT 'http://rdf4j-server:8080/rdf4j-server/repositories/virtuoso'
+      --header 'Content-Type: text/turtle'
+      --data-raw '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+      @prefix rep: <http://www.openrdf.org/config/repository#>.
+      @prefix sparql: <http://www.openrdf.org/config/sparql#>.
+      @prefix config: <tag:rdf4j.org,2023:config/>.
+
+      [] a config:Repository ;
+        config:rep.id "virtuoso" ;
+        rdfs:label "SPARQL endpoint virtuoso" ;
+        config:rep.impl [
+            config:rep.type "openrdf:SPARQLRepository";
+            config:sparql.queryEndpoint <http://database:8890/sparql>;
+            config:sparql.updateEndpoint <http://database:8890/sparql>
+
+        ].'
+    networks:
+      - ldes
+networks:
+  ldes:
+    driver: bridge

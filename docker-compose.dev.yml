@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+
+  resource:
+    ports:
+      - 3000:80
+
+  ldio-workbench:
+    ports:
+      - 8081:8080
+
+  database:
+    ports:
+      - 8890:8890
