@@ -287,8 +287,6 @@ Relationships are split into single value `:has-one` and multiple value `:has-ma
                                   :as "tourismeRegio")
                   (star-rating :via ,(s-prefix "schema:starRating")
                                 :as "beoordeling")
-                  ;;  (product-status :via ,(s-prefix "westtoer:Product.status")
-                  ;;                  :as "productStatus")
                   (amount :via ,(s-prefix "schema:amount")
                           :as "prijs"))
         :has-many `((media :via ,(s-prefix "logies:heeftMedia")
@@ -475,18 +473,17 @@ You can also choose to set the `MU_DEFAULT_PAGE_SIZE` environment variable befor
 
 If you want to opt out of pagination for a specific resource, add the `no-pagination-defaults` feature.
 
-  (define-resource media ()
-  :class (s-prefix "logies:MediaObject")
-  :properties `((:lokale-identificator :rdfs-string ,(s-prefix "generiek:lokaleIdentificator"))
-                (:naamruimte :rdfs-string ,(s-prefix "generiek:naamruimte"))
-                (:afbeelding :url ,(s-prefix "schema:contentUrl"))
-                (:publicatie-datum :datetime ,(s-prefix "schema:datePublished"))
-                (:omschrijving :language-string-set ,(s-prefix "schema:description"))
-                (:is-spotlight :boolean ,(s-prefix "westtoer:isSpotlight"))
-                (:sort-order :rdfs-integer ,(s-prefix "westtoer:sortOrder")))
-  :features '(no-pagination-defaults)
-  :resource-base (s-url "https://westtoer.be/id/media/")
-  :on-path "media")
+      (define-resource media ()
+      :class (s-prefix "logies:MediaObject")
+      :properties `((:lokale-identificator :rdfs-string ,(s-prefix "generiek:lokaleIdentificator"))
+                    (:naamruimte :rdfs-string ,(s-prefix "generiek:naamruimte"))
+                    (:afbeelding :url ,(s-prefix "schema:contentUrl"))
+                    (:publicatie-datum :datetime ,(s-prefix "schema:datePublished"))
+                    (:omschrijving :language-string-set ,(s-prefix "schema:description"))
+                    (:is-spotlight :boolean ,(s-prefix "westtoer:isSpotlight"))
+                    (:sort-order :rdfs-integer ,(s-prefix "westtoer:sortOrder")))
+      :resource-base (s-url "https://westtoer.be/id/media/")
+      :on-path "media")
 
 
 If you want to override the page size for a specific request, you can do so by suppling the `page[size]` query parameter:
