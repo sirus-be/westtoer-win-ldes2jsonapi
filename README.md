@@ -1,6 +1,6 @@
 # SPARQL to JSONAPI
 
-This repository provides a [JSON:API](http://jsonapi.org)-compatible interface to the LDES of Westtoer using [mu-cl-resources](https://github.com/mu-semtech/mu-cl-resources) as a base. Most configuration occurs in the domain file (`config/domain.lisp`). This file defines the connection between the JSON world and the RDF world. When adjusting the model, ensure you have a clear understanding of how both worlds interact.
+This repository provides a [JSON:API](http://jsonapi.org)-compatible interface to the LDES of Westtoer using [mu-cl-resources](https://github.com/mu-semtech/mu-cl-resources) as a base. Most configuration occurs in the domain file (`config/resources/domain.lisp`). This file defines the connection between the JSON world and the RDF world. When adjusting the model, ensure you have a clear understanding of how both worlds interact.
 
 
 ## Tutorials
@@ -30,13 +30,13 @@ Currently, the following resource types and endpoints are defined:
 - **prijzen**
 - **identificatoren**
 
-For more details on the definitions, supported attributes, and how everything is connected, refer to the [`config/domain.lisp`](config/domain.lisp) file.
+For more details on the definitions, supported attributes, and how everything is connected, refer to the [`config/domain.lisp`](config/resources/domain.lisp) file.
 
 ### Introduction to Configuration through `domain.lisp`
 
-As mentioned earlier, `mu-cl-resources` is configured via the `domain.lisp` file. Additionally, the [`repository.lisp`](config/repository.lisp) file can be used to define new prefixes to shorten your domain description. 
+As mentioned earlier, `mu-cl-resources` is configured via the `domain.lisp` file. Additionally, the [`repository.lisp`](config/resources/repository.lisp) file can be used to define new prefixes to shorten your domain description. 
 
-#### Introduction config/domain.lisp
+#### Introduction config/resources/domain.lisp
 
 The domain.lisp contains resource definitions for each resource type in the application.  These resource definitions provide a three-way connection:
 
@@ -135,9 +135,9 @@ The complete setup of our user and account looks as follows:
       :resource-base (s-url "http://my-application.com/accounts/")
       :on-path "accounts")
 
-#### Introduction config/repositories.lisp
+#### Introduction config/resources/repositories.lisp
 
-The previous example used the foaf prefix in order to denote classes and properties.  The `/configuration/repositories.lisp` allows you to specify your own prefixes to use in your definitions.  A good source for commonly used abbreviations is [prefix.cc](https://prefix.cc).
+The previous example used the foaf prefix in order to denote classes and properties.  The `repositories.lisp` allows you to specify your own prefixes to use in your definitions.  A good source for commonly used abbreviations is [prefix.cc](https://prefix.cc).
 
     (add-prefix "foaf" "http://xmlns.com/foaf/0.1/")
 
@@ -550,71 +550,6 @@ Note: mu-cl-resources speaks the protocol of this cache, but does not update the
 mu-cl-resources has multiple levels of caching and can update these when it updates the model in the database.  when external services update the semantic model, mu-cl-resources needs to be informed about these changes so it can correctly clear the caches it maintains.
 
 In order for cache clearing to work, delta's need to be received.  This requires setting up mu-authorization and delta-notifier to receive the delta's.  mu-authorization needs to be configured so it sends raw delta messages to the delta-notifier.  The delta-notifier needs to be configured so it forwards the correct format to mu-cl-resources.  mu-cl-resources needs to be wired to the mu-cache so it can clear those caches when changes arrive.
-
-##### Configuring mu-authorization and wiring to delta-notifier
-
-mu-authorization handles security for most calls in your backend and creates delta messages for all updated triples.  See the [mu-semtech/mu-authorization readme](https://github.com/mu-semtech/mu-authorization) for information on how to set up this security layer.
-
-The delta-notifier can send messages to various entities to update their internal caches.  See [mu-semtech/delta-notifier readme](https://github.com/mu-semtech/delta-notifier) for more information on how to add the delta-notifier to your stack.
-
-
-##### Wiring the delta-notifier, mu-cache, and mu-cl-resources
-
-In the following setup we assume a few names.  `resourcebackend` is the name for the mu-cl-resources component, `resourcecache` is the name for the mu-cl-resources cache.  Update the examples so they match your use-case.
-
-All services need to be booted up, and we need to ensure we have the naming right for our further wiring.
-
-Update the `docker-compose.yml` so the wiring contains the following (we only discuss the pieces relevant for our setup):
-
-``` yaml
-  services:
-    resourcebackend:
-      image: semtech/mu-cl-resources:1.20.0
-      environment:
-        CACHE_CLEAR_PATH: "http://resourcecache/.mu/clear-keys"
-    resourcecache:
-      image: semtech/mu-cache
-      links:
-        - resourcebackend:backend
-    deltanotifier:
-      image: semtech/mu-delta-notifier
-      volumes:
-          - ./config/delta:/config
-```
-
-The delta-notifier has to inform resources about all changes which did not originate from mu-cl-resources.  Version 1.18.0 experts resource format v0.0.1.
-
-Ensure the `./config/delta/rules.js` contains at least the following rule (you can add rules to the top-level array):
-
-``` javascript
-  export default [
-    {
-      match: {
-        subject: { }
-      },
-      callback: {
-        url: "http://resourcebackend/.mu/delta",
-        method: "POST"
-      },
-      options: {
-        resourceFormat: "v0.0.1",
-        gracePeriod: 250,
-        ignoreFromSelf: true
-      }
-    }
-  ];
-```
-
-To ensure mu-cl-resources sends its updates back to the resourcecache, it needs to have the `CACHE_CLEAR_PATH` environment variable set, as in the example docker-compose.yml above.
-
-``` yaml
-  services:
-    resourcebackend:
-      image: semtech/mu-cl-resources:1.20.0
-      environment:
-        CACHE_CLEAR_PATH: "http://resourcecache/.mu/clear-keys"
-```
-
 
 ## Linked resources
 
