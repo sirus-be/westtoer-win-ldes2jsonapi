@@ -339,8 +339,6 @@ We will mostly base ourselves on the example which was previous supplied.
                                 :as "tourismeRegio")
                 (star-rating :via ,(s-prefix "schema:starRating")
                               :as "beoordeling")
-                ;;  (product-status :via ,(s-prefix "westtoer:Product.status")
-                ;;                  :as "productStatus")
                 (amount :via ,(s-prefix "schema:amount")
                         :as "prijs"))
       :has-many `((media :via ,(s-prefix "logies:heeftMedia")
@@ -477,23 +475,27 @@ You can also choose to set the `MU_DEFAULT_PAGE_SIZE` environment variable befor
 
 If you want to opt out of pagination for a specific resource, add the `no-pagination-defaults` feature.
 
-    (define-resource account ()
-      :class (s-prefix "foaf:OnlineAccount")
-      :properties `((:name :string ,(s-prefix "foaf:accountName")))
-      :has-one `((person :via ,(s-prefix "foaf:accounts")
-                         :inverse t
-                         :as "owner"))
-      :features '(no-pagination-defaults)
-      :resource-base (s-url "http://my-application.com/accounts/")
-      :on-path "accounts")
+  (define-resource media ()
+  :class (s-prefix "logies:MediaObject")
+  :properties `((:lokale-identificator :rdfs-string ,(s-prefix "generiek:lokaleIdentificator"))
+                (:naamruimte :rdfs-string ,(s-prefix "generiek:naamruimte"))
+                (:afbeelding :url ,(s-prefix "schema:contentUrl"))
+                (:publicatie-datum :datetime ,(s-prefix "schema:datePublished"))
+                (:omschrijving :language-string-set ,(s-prefix "schema:description"))
+                (:is-spotlight :boolean ,(s-prefix "westtoer:isSpotlight"))
+                (:sort-order :rdfs-integer ,(s-prefix "westtoer:sortOrder")))
+  :features '(no-pagination-defaults)
+  :resource-base (s-url "https://westtoer.be/id/media/")
+  :on-path "media")
+
 
 If you want to override the page size for a specific request, you can do so by suppling the `page[size]` query parameter:
 
-    GET /people?page[size]=100
+    GET /media?page[size]=100
 
 If you want to request a different page and a different page size, supply both `page[size]` and `page[number]`:
 
-    GET /people?page[size]=42&page[number]=3
+    GET /media?page[size]=42&page[number]=3
 
 If you want mu-cl-resources to yield the total amount of results in the `meta` portion of the response, set `*include-count-in-paginated-responses*` to `t` in your `domain.lisp`.
 
@@ -504,17 +506,14 @@ If you want mu-cl-resources to yield the total amount of results in the `meta` p
 
 Sparse fieldsets is also [a feature of JSONAPI](http://jsonapi.org/format/#fetching-sparse-fieldsets).  If your model has many attributes, but you do not intend to render them on the frontend, you can opt out of fetching them.  Use the `fields` query parameter to fetch only the necessary results.
 
-The `fields` parameter needs to be scoped to the type of the objects for which you want to limit the returned properties.  If we'd want to return only the name for a people listing, we'd use the following:
+The `fields` parameter needs to be scoped to the type of the objects for which you want to limit the returned properties.  If we'd want to return only the name for a  tourist-attractions listing, we'd use the following:
 
-    GET /people?fields[people]=name
+    GET /attracties?fields[attracties]=naam
 
-This becomes more intersting as we include more resources.  Say that I include the publications, but only the title and publication-date of these should be taken into account.
+This becomes more intersting as we include more resources.  Say that I include the adres, but only the municipality and post-code.
 
-    GET /people?include=publications&fields[people]=name&fields[documents]=publication-date,title
+    GET /attracties?include=adres&fields[attracties]=naam&fields[adres]=gemeente,post-code
 
-You can add filters to ensure we only get authors of papers aged over 42 which have a Dropbox account:
-
-    GET /people?filter[accounts][:exact:name]=Dropbox&filter[:gt:age]=42&filter[:has:publication]=true&include=publications
 
 
 ### Caching
