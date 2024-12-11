@@ -5,6 +5,10 @@ This repository provides a [JSON:API](http://jsonapi.org)-compatible interface t
 
 ## Tutorials
 
+### Getting started with the API
+
+A quick start guide for using the JSON:API, which includes examples, is available [here](/getting_started.md).
+
 ### Starting the Service
 
 All components use Docker Compose. To start the stack, run:
