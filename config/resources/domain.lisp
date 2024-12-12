@@ -57,23 +57,22 @@
                           :as "beoordeling")
             ;;  (product-status :via ,(s-prefix "westtoer:Product.status")
             ;;                  :as "productStatus")
+             (registration :via ,(s-prefix "logies:heeftRegistratie")
+                           :as "registratie")
              (amount :via ,(s-prefix "schema:amount")
-                     :as "prijs"))
+                     :as "prijs")
+             (capacity :via ,(s-prefix "logies:capaciteit")
+                      :as "capaciteit"))  
   :has-many `((media :via ,(s-prefix "logies:heeftMedia")
                      :as "media")
+              (kwaliteitslabel :via ,(s-prefix "logies:heeftKwaliteitsLabel")
+                                :as "kwaliteitslabels")
               (amenity-feature :via ,(s-prefix "schema:amenityFeature")
                                 :as "faciliteiten"))
   :resource-base (s-url "https://westtoer.be/id/product/")
   :on-path "attracties")
 
-  (define-resource geometry ()
-  :class (s-prefix "generiek:Geometrie")
-  :properties `((:latitude :xsd-secure-double ,(s-prefix "wgs84_pos:lat"))
-                (:longitude :xsd-secure-double ,(s-prefix "wgs84_pos:long")))
-  :resource-base (s-url "https://westtoer.be/id/geometry/")
-  :on-path "geometries")
 
-;; need to fix
   (define-resource identificator ()
   :class (s-prefix "adms:Identifier")
   :properties `((:aangemaakt-door :rdf-resource ,(s-prefix "terms:creator"))
@@ -81,7 +80,8 @@
                 (:schema-agentschap :string ,(s-prefix  "adms:schemaAgency")))
   :resource-base (s-url "https://westtoer.be/id/identificator/")
   :on-path "identificatoren")
-  
+
+
   (define-resource address ()
   :class (s-prefix "locn:Address")
   :properties `((:provincie :language-string-set ,(s-prefix "locn:adminUnitL2"))
@@ -102,6 +102,7 @@
   :resource-base (s-url "https://westtoer.be/id/address/")
   :on-path "adressen")
 
+
   (define-resource geometry ()
   :class (s-prefix "generiek:Geometrie")
   :properties `((:latitude :xsd-secure-double ,(s-prefix "wgs84_pos:lat"))
@@ -109,15 +110,6 @@
   :resource-base (s-url "https://westtoer.be/id/geometry/")
   :on-path "geometries")
 
-  (define-resource contact-point ()
-  :class (s-prefix "schema:ContactPoint")
-  :properties `((:website :uri ,(s-prefix "foaf:page"))
-                (:type :string ,(s-prefix "schema:contactType"))
-                (:fax :string ,(s-prefix "schema:faxNumber"))
-                (:email :string ,(s-prefix "schema:email"))
-                (:telefoonnummer :string ,(s-prefix "schema:telephone")))
-  :resource-base (s-url "https://westtoer.be/id/contact-point/")
-  :on-path "contactpunten")
 
   (define-resource tourist-region ()
   :class (s-prefix "logies:ToeristischeRegio")
@@ -126,23 +118,29 @@
   :resource-base (s-url "https://westtoer.be/id/tourist-region/")
   :on-path "tourisme-regios")
 
-  (define-resource star-rating ()
-  :class (s-prefix "schema:Rating")
-  :properties `((:type :url ,(s-prefix "terms:type"))
-                (:auteur :url ,(s-prefix "schema:author"))
-                (:omschrijving :language-string-set ,(s-prefix "schema:description"))
-                (:beste-score :string ,(s-prefix "schema:bestRating"))
-                (:slechtste-score :string ,(s-prefix "schema:worstRating"))
-                (:beoordeling-score :string ,(s-prefix "schema:ratingValue")))
-  :resource-base (s-url "https://westtoer.be/id/star-rating/")
-  :on-path "beoordelingen")
 
-  (define-resource amount ()
-  :class (s-prefix "schema:MonetaryAmount")
-  :properties `((:prijs :number ,(s-prefix "schema:value"))
-                (:eenheid :string ,(s-prefix "schema:currency")))
-  :resource-base (s-url "https://westtoer.be/id/amount/")
-  :on-path "prijzen")
+  (define-resource contact-point ()
+  :class (s-prefix "schema:ContactPoint")
+  :properties `((:website :uri ,(s-prefix "foaf:page"))
+                (:type :string ,(s-prefix "schema:contactType"))
+                (:fax :string ,(s-prefix "schema:faxNumber"))
+                (:email :string ,(s-prefix "schema:email"))
+                (:telefoonnummer :string ,(s-prefix "schema:telephone")))
+  :has-one `((opening-hours :via ,(s-prefix "schema:hoursAvailable")
+                           :as "openingsuren"))
+  :resource-base (s-url "https://westtoer.be/id/contact-point/")
+  :on-path "contactpunten")
+
+
+(define-resource opening-hours ()
+  :class (s-prefix "schema:OpeningHoursSpecification")
+  :properties `((:sluit :string ,(s-prefix "schema:closes"))
+                (:open :string ,(s-prefix "schema:opens"))
+                (:geldig-van :datetime ,(s-prefix "schema:validFrom"))
+                (:geldig-tot :datetime ,(s-prefix "schema:validThrough")))
+  :resource-base (s-url "https://westtoer.be/id/opening-hours/")
+  :on-path "openingsuren")
+
 
   (define-resource media ()
   :class (s-prefix "logies:MediaObject")
@@ -163,6 +161,48 @@
   :resource-base (s-url "https://westtoer.be/id/amenity-feature/")
   :on-path "faciliteiten")
 
+
+  (define-resource kwaliteitslabel ()
+  :class (s-prefix "logies:Kwaliteitslabel")
+  :properties `((:label :language-string-set ,(s-prefix "core:prefLabel"))
+                (:toegekend-op :datetime ,(s-prefix "terms:issued"))
+                (:toegekend-door :rdf-resource ,(s-prefix "schema:author"))
+                 (:type :rdf-resource ,(s-prefix "terms:type")))
+  :resource-base (s-url "https://westtoer.be/id/kwaliteitslabel/")
+  :on-path "kwaliteitslabels")
+
+
+  (define-resource registration ()
+  :class (s-prefix "logies:Registratie")
+  :properties `((:geassocieerd-aan :rdf-resource ,(s-prefix "prov:wasAssociatedWith")))
+  :resource-base (s-url "https://westtoer.be/id/registration/")
+  :on-path "registraties")
+
+  (define-resource star-rating ()
+  :class (s-prefix "schema:Rating")
+  :properties `((:type :url ,(s-prefix "terms:type"))
+                (:auteur :url ,(s-prefix "schema:author"))
+                (:omschrijving :language-string-set ,(s-prefix "schema:description"))
+                (:beste-score :string ,(s-prefix "schema:bestRating"))
+                (:slechtste-score :string ,(s-prefix "schema:worstRating"))
+                (:beoordeling-score :string ,(s-prefix "schema:ratingValue")))
+  :resource-base (s-url "https://westtoer.be/id/star-rating/")
+  :on-path "beoordelingen")
+
+  (define-resource amount ()
+  :class (s-prefix "schema:MonetaryAmount")
+  :properties `((:prijs :number ,(s-prefix "schema:value"))
+                (:eenheid :string ,(s-prefix "schema:currency")))
+  :resource-base (s-url "https://westtoer.be/id/amount/")
+  :on-path "prijzen")
+
+
+  (define-resource capacity ()
+  :class (s-prefix "schema:QuantitativeValue")
+  :properties `((:aantal :string ,(s-prefix "schema:unitText"))
+                (:eenheid :number ,(s-prefix "schema:value")))
+  :resource-base (s-url "https://westtoer.be/id/capacity/")
+  :on-path "capaciteiten")
 
 ;; unable to implemented
 ;;   (define-resource product-status ()

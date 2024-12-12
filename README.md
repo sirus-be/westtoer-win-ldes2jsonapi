@@ -27,6 +27,10 @@ Currently, the following resource types and endpoints are defined:
 - **adressen**
 - **geometries**
 - **contactpunten**
+- **kwaliteitslabels**
+- **capaciteiten**
+- **registraties**
+- **openingsuren**
 - **tourisme-regios**
 - **beoordelingen**
 - **media**

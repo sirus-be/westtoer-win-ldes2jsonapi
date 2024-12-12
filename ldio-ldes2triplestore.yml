@@ -44,9 +44,12 @@ orchestrator:
               ?oNotBlank ?p2 ?o2NotBlank .
               ?o2NotBlank ?p3 ?o3NotBlank .
               ?o3NotBlank ?p4 ?o4NotBlank .
-
+              ?o4NotBlank ?p5 ?o5NotBlank .
               ?oNotBlank mu:uuid ?uuidGenerated .
+              ?o2NotBlank mu:uuid ?uuidGeneratedO2 .
               ?oNotBlank westtoer:identifier ?notationString .
+              ?o2NotBlank schema:opens ?fixedOpens .
+              ?o2NotBlank schema:closes ?fixedCloses .
 
             }
             WHERE {
@@ -68,11 +71,35 @@ orchestrator:
 
               OPTIONAL {
                 ?o ?p2 ?o2 .
+
+                OPTIONAL {
+                    ?o2 rdf:type ?typeO2 .
+                    BIND(STRUUID() AS ?uuidGeneratedO2)
+                }
+
                 
                 OPTIONAL {
                   ?o2 ?p3 ?o3 .
+
+                  FILTER (?p3 != <https://schema.org/opens>)
+                  FILTER (?p3 != <https://schema.org/closes>)
+
+                  OPTIONAL {
+                    ?o2 schema:opens ?opens .
+                    ?o2 schema:closes ?closes .
+                    BIND(str(?opens) as ?fixedOpens)
+                    BIND(str(?closes) as ?fixedCloses)
+
+                  }
+
+                  
+
+
                   OPTIONAL {
                     ?o3 ?p4 ?o4 .
+                    OPTIONAL {
+                        ?o4 ?p5 ?o5 .
+                    }
                   }
                 }
               }
@@ -94,7 +121,8 @@ orchestrator:
               BIND(if(isBlank(?o2) && !isLiteral(?o2), URI(concat(?skolemBase, md5(concat(str(?product), str(?o2))))), ?o2) as ?o2NotBlank)
               BIND(if(isBlank(?o3) && !isLiteral(?o3), URI(concat(?skolemBase, md5(concat(str(?product), str(?o3))))), ?o3) as ?o3NotBlank)
               BIND(if(isBlank(?o4) && !isLiteral(?o4), URI(concat(?skolemBase, md5(concat(str(?product), str(?o4))))), ?o4) as ?o4NotBlank)
-            
+              BIND(IF(ISBLANK(?o5) && !ISLITERAL(?o5), URI(CONCAT(?skolemBase, MD5(CONCAT(STR(?product), STR(?o5))))), ?o5) AS ?o5NotBlank)
+
               }
 
             "
