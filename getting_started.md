@@ -26,6 +26,7 @@ Currently, the following resource types and endpoints are defined:
 ## Basic harvesting
 
 This section explains how you can retrieve all data per city through pagination, and how you can stay up to date.
+The API has following base URL: https://ca-proxy-westtoer-data.calmmushroom-8db04b5f.westeurope.azurecontainerapps.io
 
 ### Replication
 
