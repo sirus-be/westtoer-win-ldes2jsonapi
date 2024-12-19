@@ -149,6 +149,18 @@ orchestrator:
           cron: "*/60 * * * * *"
         adapter:
             name: Ldio:RdfAdapter
+      transformers:
+        - name: "Ldio:SparqlConstructTransformer"
+          config:
+            query: "
+              PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+              CONSTRUCT {
+                ?s ?p ?o .
+                ?s a skos:Concept .
+              } WHERE {
+                ?s ?p ?o .
+              }
+            "
       outputs:
         # - name: Ldio:ConsoleOut
         - name: Ldio:RepositorySink
