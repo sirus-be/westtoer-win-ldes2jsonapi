@@ -49,7 +49,7 @@ This can be done by adding a filter parameter on generated-at-time.
 
 For example, to retrieve all updates greater than or equal to 2024-10-06: `filter[:gte:generated-at-time]=2024-10-06`
 
-GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,geometrie,contactpunt,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
+    GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,geometrie,contactpunt,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
 
 You can also filter on a timestamp: `filter[:gte:generated-at-time]=2024-10-10T11:50:27Z`
 
