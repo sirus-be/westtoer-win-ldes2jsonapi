@@ -30,15 +30,15 @@ The API has following base URL: https://ca-proxy-westtoer-data.calmmushroom-8db0
 
 ### Replication
 
-Use following URL to retrieve the first 20 (default) Westtoer products, located in the city of Brugge, with everything included:
+Use following URL to retrieve the first 20 (default) Westtoer products, located in the city of Brugge (NIS code 31005), with everything included:
 
-    GET /attracties?filter[adres][post-code]=8000&include=identificator,adres,geometrie,contactpunt,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
+    GET /attracties?filter[adres][nis-code]=31005&include=identificator,adres,geometrie,contactpunt,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
 
 NOTE: we are still in progress of mapping all fields (layout, product status...)
 
 Then, follow the "Next" page link mentioned in the response towards the next 20 products. For example:
 
-    GET /attracties?filter[adres][post-code]=8000&page[number]=1&include=identificator,adres,geometrie,contactpunt,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
+    GET /attracties?filter[adres][nis-code]=31005&page[number]=1&include=identificator,adres,geometrie,contactpunt,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
 
 Repeat this process until there is no "Next" link available.
 
@@ -49,7 +49,7 @@ This can be done by adding a filter parameter on generated-at-time.
 
 For example, to retrieve all updates greater than or equal to 2024-10-06: `filter[:gte:generated-at-time]=2024-10-06`
 
-GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][post-code]=8000&include=identificator,adres,geometrie,contactpunt,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
+GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,geometrie,contactpunt,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
 
 You can also filter on a timestamp: `filter[:gte:generated-at-time]=2024-10-10T11:50:27Z`
 
