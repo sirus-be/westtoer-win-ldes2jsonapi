@@ -54,3 +54,4 @@
 (add-prefix "westtoer" "https://westtoer.be/ns#")
 (add-prefix "adres" "https://data.vlaanderen.be/ns/adres#")
 (add-prefix "foaf" "http://xmlns.com/foaf/0.1/")
+(add-prefix "datatourisme" "https://www.datatourisme.fr/ontology/core#")

@@ -31,8 +31,11 @@ def proxy_get_request(path):
     Pipe all GET requests to the target API endpoint.
     """
     # Construct the full URL to the target API
-    logger.info(f"Received GET request for path {path}")
     normalized_path = path.rstrip('/')
+
+    logger.info(f"Received GET request for path {path}")
+    logger.info(f"Normalized path is {normalized_path}")
+    
     if normalized_path == "sparql":
         target_url = f"{SPARQL_API_URL}/{path}"
     else:

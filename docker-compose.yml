@@ -17,7 +17,7 @@ services:
     restart: always
     environment:
       TARGET_API_URL: "http://resource"
-      SPARQL_API_URL: "http://database:8890/sparql"
+      SPARQL_API_URL: "http://database:8890"
     ports:
       - 80:80
     networks:
@@ -27,14 +27,13 @@ services:
     logging: *default-logging
     labels:
       - "logging=true"
-    image: svercoutere/sirus-mu-resources:0.0.1
-    links:
-      - database:database
+    image: svercoutere/sirus-mu-resources:0.0.2
     volumes:
       - ./config/resources:/config
     restart: always
     environment:
       CACHE_CLEAR_PATH: "http://cache/.mu/clear-keys"
+      SPARQL_API_URL: "http://database:8890"
     networks:
       - ldes
 
@@ -74,7 +73,8 @@ services:
     container_name: westtoer_ldes2triplestore_rdf4j
     environment:
       - "JAVA_OPTS=-Xms1g -Xmx4g"
-
+    ports:
+      - 8080:8080
     networks:
       - ldes
     healthcheck:
