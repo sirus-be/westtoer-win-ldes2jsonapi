@@ -23,6 +23,7 @@ orchestrator:
           config:
             query: "
             
+            
             PREFIX dcmitype: <http://purl.org/dc/dcmitype/>
             PREFIX schema: <https://schema.org/>
             PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
@@ -33,7 +34,7 @@ orchestrator:
             PREFIX locn: <http://www.w3.org/ns/locn#>
             PREFIX wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
             PREFIX adres: <https://data.vlaanderen.be/ns/adres#>
-            PREFIX westtoer: <https://westtoer.be/ns#>
+            PREFIX westtoer: <https://data.westtoer.be/ns#>
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX logies: <https://data.vlaanderen.be/ns/logies#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -63,11 +64,19 @@ orchestrator:
 
               ?product ?p ?o .
               
-
               OPTIONAL {
                 ?o rdf:type ?typeO .
                 BIND(STRUUID() AS ?uuidGenerated)
               }
+
+              BIND(
+                  IF(
+                    ISBLANK(?o) && !isLiteral(?o),
+                    IF(BOUND(?typeO), ?typeO, skos:Concept),
+                    ?oTypeNotBlank
+                  ) 
+                  AS ?oTypeNotBlank
+              )
 
               OPTIONAL {
                 ?o ?p2 ?o2 .
@@ -76,7 +85,6 @@ orchestrator:
                     ?o2 rdf:type ?typeO2 .
                     BIND(STRUUID() AS ?uuidGeneratedO2)
                 }
-
                 
                 OPTIONAL {
                   ?o2 ?p3 ?o3 .
@@ -91,8 +99,6 @@ orchestrator:
                     BIND(str(?closes) as ?fixedCloses)
 
                   }
-
-                  
 
 
                   OPTIONAL {
@@ -116,7 +122,7 @@ orchestrator:
 
 
 
-              BIND('https://westtoer.be/id/.well-known/genid/' as ?skolemBase)
+              BIND('https://data.westtoer.be/id/.well-known/genid/' as ?skolemBase)
               BIND(if(isBlank(?o) && !isLiteral(?o), URI(concat(?skolemBase, md5(concat(str(?product), str(?o))))), ?o) as ?oNotBlank)
               BIND(if(isBlank(?o2) && !isLiteral(?o2), URI(concat(?skolemBase, md5(concat(str(?product), str(?o2))))), ?o2) as ?o2NotBlank)
               BIND(if(isBlank(?o3) && !isLiteral(?o3), URI(concat(?skolemBase, md5(concat(str(?product), str(?o3))))), ?o3) as ?o3NotBlank)
@@ -124,6 +130,7 @@ orchestrator:
               BIND(IF(ISBLANK(?o5) && !ISLITERAL(?o5), URI(CONCAT(?skolemBase, MD5(CONCAT(STR(?product), STR(?o5))))), ?o5) AS ?o5NotBlank)
 
               }
+
 
             "
       outputs:

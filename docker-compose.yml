@@ -6,9 +6,8 @@ x-logging: &default-logging
     max-size: "10m"
     max-file: "3"
 
-
-
 services:
+
   proxy:
     logging: *default-logging
     labels:
@@ -109,6 +108,7 @@ services:
         ].'
     networks:
       - ldes
+
 networks:
   ldes:
     driver: bridge

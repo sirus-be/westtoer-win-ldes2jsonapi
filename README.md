@@ -210,7 +210,7 @@ Each defined resource is specified by the `define-resource` construction.  An ex
                         :as "media")
                   (amenity-feature :via ,(s-prefix "schema:amenityFeature")
                                     :as "faciliteiten"))
-      :resource-base (s-url "https://westtoer.be/id/product/")
+      :resource-base (s-url "https://data.westtoer.be/id/product/")
       :on-path "attracties")
 
 
@@ -351,7 +351,7 @@ We will mostly base ourselves on the example which was previous supplied.
                         :as "media")
                   (amenity-feature :via ,(s-prefix "schema:amenityFeature")
                                     :as "faciliteiten"))
-      :resource-base (s-url "https://westtoer.be/id/product/")
+      :resource-base (s-url "https://data.westtoer.be/id/product/")
       :on-path "attracties")
 
 #### Basic filtering
@@ -490,7 +490,7 @@ If you want to opt out of pagination for a specific resource, add the `no-pagina
                     (:omschrijving :language-string-set ,(s-prefix "schema:description"))
                     (:is-spotlight :boolean ,(s-prefix "westtoer:isSpotlight"))
                     (:sort-order :rdfs-integer ,(s-prefix "westtoer:sortOrder")))
-      :resource-base (s-url "https://westtoer.be/id/media/")
+      :resource-base (s-url "https://data.westtoer.be/id/media/")
       :on-path "media")
 
 
