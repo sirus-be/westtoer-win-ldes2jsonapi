@@ -22,7 +22,6 @@ orchestrator:
         - name: "Ldio:SparqlConstructTransformer"
           config:
             query: "
-            
             PREFIX dcmitype: <http://purl.org/dc/dcmitype/>
             PREFIX schema: <https://schema.org/>
             PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
@@ -51,8 +50,11 @@ orchestrator:
               ?o2NotBlank schema:opens ?fixedOpens .
               ?o2NotBlank schema:closes ?fixedCloses .
 
+              ?concept a skos:Concept ;
+                      mu:uuid ?conceptUuid .  
             }
             WHERE {
+            {
               {
                 ?product a dcmitype:Collection .
               }
@@ -62,26 +64,28 @@ orchestrator:
               }
 
               ?product ?p ?o .
-              FILTER (?p != skos:prefLabel)
 
               OPTIONAL {
                 ?o rdf:type ?typeO .
                 BIND(STRUUID() AS ?uuidGenerated)
+                FILTER NOT EXISTS {
+                  ?o rdf:type logies:ToeristischeRegio .
+                }
               }
 
               OPTIONAL {
                 ?o ?p2 ?o2 .
-                FILTER (?p2 != skos:prefLabel)
+                FILTER NOT EXISTS {
+                  ?o rdf:type logies:ToeristischeRegio .
+                }
 
                 OPTIONAL {
                     ?o2 rdf:type ?typeO2 .
                     BIND(STRUUID() AS ?uuidGeneratedO2)
                 }
-
                 
                 OPTIONAL {
                   ?o2 ?p3 ?o3 .
-                  FILTER (?p3 != skos:prefLabel)
 
                   FILTER (?p3 != <https://schema.org/opens>)
                   FILTER (?p3 != <https://schema.org/closes>)
@@ -96,10 +100,8 @@ orchestrator:
 
                   OPTIONAL {
                     ?o3 ?p4 ?o4 .
-                    FILTER (?p4 != skos:prefLabel)
                     OPTIONAL {
                         ?o4 ?p5 ?o5 .
-                        FILTER (?p5 != skos:prefLabel)
                     }
                   }
                 }
@@ -124,60 +126,70 @@ orchestrator:
               BIND(if(isBlank(?o4) && !isLiteral(?o4), URI(concat(?skolemBase, md5(concat(str(?product), str(?o4))))), ?o4) as ?o4NotBlank)
               BIND(IF(ISBLANK(?o5) && !ISLITERAL(?o5), URI(CONCAT(?skolemBase, MD5(CONCAT(STR(?product), STR(?o5))))), ?o5) AS ?o5NotBlank)
 
+            }
+            UNION
+            {
+              ?concept skos:prefLabel ?prefLabel .
+              FILTER (!isBlank(?concept))
+              FILTER NOT EXISTS {
+                  ?concept rdf:type logies:ToeristischeRegio .
               }
-
+              BIND(CONCAT('uuid-', SHA256(STR(?concept))) AS ?conceptUuid)
+              
+            }
+          }
             "
       outputs:
-        # - name: Ldio:ConsoleOut
+        - name: Ldio:ConsoleOut
+          config:
+            rdf-writer:
+              content-type: text/turtle
+        # - name: Ldio:RepositorySink
         #   config:
-        #     rdf-writer:
-        #       content-type: application/n-quads
-        - name: Ldio:RepositorySink
-          config:
-            sparql-host: http://rdf4j-server:8080/rdf4j-server
-            repository-id: virtuoso
-            named-graph: http://mu.semte.ch/application
-            batch-size: 1
-    - name: taxonomies
-      description: "This pipeline will fetch the product types and tree taxonomies."
-      input:
-        name: Ldio:HttpInPoller
-        config:
-          url:
-            - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/producttypes.jsonld
-            - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/taxonomies-tree.jsonld
-            - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/toeristische-regios.jsonld
-          cron: "*/60 * * * * *"
-        adapter:
-            name: Ldio:RdfAdapter
-      transformers:
-        - name: "Ldio:SparqlConstructTransformer"
-          config:
-            query: "
-              PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  
-              PREFIX mu: <http://mu.semte.ch/vocabularies/core/>  
-              PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  
+        #     sparql-host: http://rdf4j-server:8080/rdf4j-server
+        #     repository-id: virtuoso
+        #     named-graph: http://mu.semte.ch/application
+        #     batch-size: 1
+    # - name: taxonomies
+    #   description: "This pipeline will fetch the product types and tree taxonomies."
+    #   input:
+    #     name: Ldio:HttpInPoller
+    #     config:
+    #       url:
+    #         - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/producttypes.jsonld
+    #         - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/taxonomies-tree.jsonld
+    #         - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/toeristische-regios.jsonld
+    #       cron: "*/60 * * * * *"
+    #     adapter:
+    #         name: Ldio:RdfAdapter
+      # transformers:
+      #   - name: "Ldio:SparqlConstructTransformer"
+      #     config:
+      #       query: "
+      #         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  
+      #         PREFIX mu: <http://mu.semte.ch/vocabularies/core/>  
+      #         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  
  
-              CONSTRUCT {  
-                graph ?object {
-                  ?object a skos:Concept .  
-                  ?object mu:uuid ?uuid .  
-                  ?object ?p ?o .  
-                }
-              }  
-              WHERE {  
-                ?object ?p ?o .  
-                FILTER NOT EXISTS { ?object mu:uuid ?existingUuid }  
-                BIND(CONCAT('uuid-', SHA256(STR(?object))) AS ?uuid)  
+      #         CONSTRUCT {  
+      #           graph ?object {
+      #             ?object a skos:Concept .  
+      #             ?object mu:uuid ?uuid .  
+      #             ?object ?p ?o .  
+      #           }
+      #         }  
+      #         WHERE {  
+      #           ?object ?p ?o .  
+      #           FILTER NOT EXISTS { ?object mu:uuid ?existingUuid }  
+      #           BIND(CONCAT('uuid-', SHA256(STR(?object))) AS ?uuid)  
  
-              }
-            "
-      outputs:
-        # - name: Ldio:ConsoleOut
-        - name: Ldio:RepositorySink
-          config:
-            sparql-host: http://rdf4j-server:8080/rdf4j-server
-            repository-id: virtuoso
-            named-graph: http://mu.semte.ch/application
-            batch-timeout: 10000
-            batch-size: 10
+      #         }
+      #       "
+      # outputs:
+      #   # - name: Ldio:ConsoleOut
+      #   - name: Ldio:RepositorySink
+      #     config:
+      #       sparql-host: http://rdf4j-server:8080/rdf4j-server
+      #       repository-id: virtuoso
+      #       named-graph: http://mu.semte.ch/application
+      #       batch-timeout: 10000
+      #       batch-size: 10
