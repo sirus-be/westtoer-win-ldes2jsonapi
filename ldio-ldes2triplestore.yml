@@ -140,56 +140,56 @@ orchestrator:
           }
             "
       outputs:
-        - name: Ldio:ConsoleOut
-          config:
-            rdf-writer:
-              content-type: text/turtle
-        # - name: Ldio:RepositorySink
+        # - name: Ldio:ConsoleOut
         #   config:
-        #     sparql-host: http://rdf4j-server:8080/rdf4j-server
-        #     repository-id: virtuoso
-        #     named-graph: http://mu.semte.ch/application
-        #     batch-size: 1
-    # - name: taxonomies
-    #   description: "This pipeline will fetch the product types and tree taxonomies."
-    #   input:
-    #     name: Ldio:HttpInPoller
-    #     config:
-    #       url:
-    #         - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/producttypes.jsonld
-    #         - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/taxonomies-tree.jsonld
-    #         - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/toeristische-regios.jsonld
-    #       cron: "*/60 * * * * *"
-    #     adapter:
-    #         name: Ldio:RdfAdapter
-      # transformers:
-      #   - name: "Ldio:SparqlConstructTransformer"
-      #     config:
-      #       query: "
-      #         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  
-      #         PREFIX mu: <http://mu.semte.ch/vocabularies/core/>  
-      #         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  
+        #     rdf-writer:
+        #       content-type: text/turtle
+        - name: Ldio:RepositorySink
+          config:
+            sparql-host: http://rdf4j-server:8080/rdf4j-server
+            repository-id: virtuoso
+            named-graph: http://mu.semte.ch/application
+            batch-size: 1
+    - name: taxonomies
+      description: "This pipeline will fetch the product types and tree taxonomies."
+      input:
+        name: Ldio:HttpInPoller
+        config:
+          url:
+            - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/producttypes.jsonld
+            - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/taxonomies-tree.jsonld
+            - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/toeristische-regios.jsonld
+          cron: "*/60 * * * * *"
+        adapter:
+            name: Ldio:RdfAdapter
+      transformers:
+        - name: "Ldio:SparqlConstructTransformer"
+          config:
+            query: "
+              PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  
+              PREFIX mu: <http://mu.semte.ch/vocabularies/core/>  
+              PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  
  
-      #         CONSTRUCT {  
-      #           graph ?object {
-      #             ?object a skos:Concept .  
-      #             ?object mu:uuid ?uuid .  
-      #             ?object ?p ?o .  
-      #           }
-      #         }  
-      #         WHERE {  
-      #           ?object ?p ?o .  
-      #           FILTER NOT EXISTS { ?object mu:uuid ?existingUuid }  
-      #           BIND(CONCAT('uuid-', SHA256(STR(?object))) AS ?uuid)  
+              CONSTRUCT {  
+                graph ?object {
+                  ?object a skos:Concept .  
+                  ?object mu:uuid ?uuid .  
+                  ?object ?p ?o .  
+                }
+              }  
+              WHERE {  
+                ?object ?p ?o .  
+                FILTER NOT EXISTS { ?object mu:uuid ?existingUuid }  
+                BIND(CONCAT('uuid-', SHA256(STR(?object))) AS ?uuid)  
  
-      #         }
-      #       "
-      # outputs:
-      #   # - name: Ldio:ConsoleOut
-      #   - name: Ldio:RepositorySink
-      #     config:
-      #       sparql-host: http://rdf4j-server:8080/rdf4j-server
-      #       repository-id: virtuoso
-      #       named-graph: http://mu.semte.ch/application
-      #       batch-timeout: 10000
-      #       batch-size: 10
+              }
+            "
+      outputs:
+        # - name: Ldio:ConsoleOut
+        - name: Ldio:RepositorySink
+          config:
+            sparql-host: http://rdf4j-server:8080/rdf4j-server
+            repository-id: virtuoso
+            named-graph: http://mu.semte.ch/application
+            batch-timeout: 10000
+            batch-size: 10
