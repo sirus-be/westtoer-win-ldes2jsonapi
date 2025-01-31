@@ -63,7 +63,8 @@ orchestrator:
               }
 
               ?product ?p ?o .
-              
+              FILTER (?p != skos:prefLabel)
+
               OPTIONAL {
                 ?o rdf:type ?typeO .
                 BIND(STRUUID() AS ?uuidGenerated)
@@ -80,6 +81,7 @@ orchestrator:
 
               OPTIONAL {
                 ?o ?p2 ?o2 .
+                FILTER (?p2 != skos:prefLabel)
 
                 OPTIONAL {
                     ?o2 rdf:type ?typeO2 .
@@ -88,6 +90,7 @@ orchestrator:
                 
                 OPTIONAL {
                   ?o2 ?p3 ?o3 .
+                  FILTER (?p3 != skos:prefLabel)
 
                   FILTER (?p3 != <https://schema.org/opens>)
                   FILTER (?p3 != <https://schema.org/closes>)
@@ -100,11 +103,12 @@ orchestrator:
 
                   }
 
-
                   OPTIONAL {
                     ?o3 ?p4 ?o4 .
+                    FILTER (?p4 != skos:prefLabel)
                     OPTIONAL {
                         ?o4 ?p5 ?o5 .
+                        FILTER (?p5 != skos:prefLabel)
                     }
                   }
                 }
@@ -156,6 +160,28 @@ orchestrator:
           cron: "*/60 * * * * *"
         adapter:
             name: Ldio:RdfAdapter
+      transformers:
+        - name: "Ldio:SparqlConstructTransformer"
+          config:
+            query: "
+              PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  
+              PREFIX mu: <http://mu.semte.ch/vocabularies/core/>  
+              PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  
+ 
+              CONSTRUCT {  
+                graph ?object {
+                  ?object a skos:Concept .  
+                  ?object mu:uuid ?uuid .  
+                  ?object ?p ?o .  
+                }
+              }  
+              WHERE {  
+                ?object ?p ?o .  
+                FILTER NOT EXISTS { ?object mu:uuid ?existingUuid }  
+                BIND(CONCAT('uuid-', SHA256(STR(?object))) AS ?uuid)  
+ 
+              }
+            "
       outputs:
         # - name: Ldio:ConsoleOut
         - name: Ldio:RepositorySink
@@ -164,3 +190,4 @@ orchestrator:
             repository-id: virtuoso
             named-graph: http://mu.semte.ch/application
             batch-timeout: 10000
+            batch-size: 10
