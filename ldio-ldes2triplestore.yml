@@ -161,6 +161,8 @@ orchestrator:
             - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/producttypes.jsonld
             - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/taxonomies-tree.jsonld
             - https://sirus-be.github.io/westtoer-win-ldes2triplestore/taxonomies/toeristische-regios.jsonld
+            - https://sirus-be.github.io/westtoer-win-ldes2jsonapi/taxonomies/municipalities.jsonld
+
           cron: "*/60 * * * * *"
         adapter:
             name: Ldio:RdfAdapter
