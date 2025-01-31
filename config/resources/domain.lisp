@@ -52,12 +52,12 @@
                        :as "geometrie")
              (contact-point :via ,(s-prefix "schema:contactPoint")
                             :as "contactpunt")
-             (tourist-region :via ,(s-prefix "logies:behoortTotToeristischeRegio")
-                             :as "tourismeRegio")
              (star-rating :via ,(s-prefix "schema:starRating")
                           :as "beoordeling")
-            ;;  (product-status :via ,(s-prefix "westtoer:Product.status")
-            ;;                   :as "productStatus")
+             (tourist-region :via ,(s-prefix "logies:behoortTotToeristischeRegio")
+                             :as "tourismeRegio")
+             (preferred-label :via ,(s-prefix "westtoer:Product.status")
+                               :as "productstatus")
              (registration :via ,(s-prefix "logies:heeftRegistratie")
                            :as "registratie")
              (amount :via ,(s-prefix "schema:amount")
@@ -83,6 +83,9 @@
   :on-path "identificatoren")
 
 
+
+;; assigned-by-x resources do not have a class in the triplestore, which complicates assigning a UUID using the sparql construct query. Which is why they are not implemented.
+
   (define-resource address ()
   :class (s-prefix "locn:Address")
   :properties `((:provincie :language-string-set ,(s-prefix "locn:adminUnitL2"))
@@ -93,15 +96,16 @@
                 (:land :language-string ,(s-prefix "adres:land"))
                 (:adres-regel-1 :string ,(s-prefix "westtoer:adresregel1"))
                 (:nis-code :integer ,(s-prefix "westtoer:gemeenteniscode"))
-                (:toegekend-door-gemeente :rdf-resource ,(s-prefix "westtoer:isToegekendDoorGemeente"))
-                (:toegekend-door-deelgemeente :rdf-resource ,(s-prefix "westtoer:isToegekendDoorDeelgemeente"))
-                (:toegekend-door-provincie :rdf-resource ,(s-prefix "westtoer:isToegekendDoorProvincie")))
-  ;; :has-one `((assigned-by-municipality :via ,(s-prefix "westtoer:isToegekendDoorGemeente")
-  ;;                                       :as "assignedByMunicipality")
-  ;;             (assigned-by-submunicipality :via ,(s-prefix "westtoer:isToegekendDoorDeelgemeente")
-  ;;                                       :as "assignedBySubmunicipality")
-  ;;             (assigned-by-province :via ,(s-prefix "westtoer:isToegekendDoorProvincie")
-  ;;                                   :as "assignedByProvince"))
+                (:toegekend-door-gemeente-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorGemeente"))
+                (:toegekend-door-deelgemeente-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorDeelgemeente"))
+                (:toegekend-door-provincie-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorProvincie"))
+                )
+  :has-one `((preferred-label :via ,(s-prefix "westtoer:isToegekendDoorGemeente")
+                                        :as "toegekend-door-gemeente")
+              (preferred-label  :via ,(s-prefix "westtoer:isToegekendDoorDeelgemeente")
+                                        :as "toegekend-door-deelgemeente")
+              (preferred-label  :via ,(s-prefix "westtoer:isToegekendDoorProvincie")
+                                    :as "toegekend-door-provincie"))
 
   :resource-base (s-url "https://data.westtoer.be/id/address/")
   :on-path "adressen")
@@ -116,9 +120,10 @@
 
 
   (define-resource tourist-region ()
-  :class (s-prefix "logies:ToeristischeRegio")
+  :class (s-prefix "core:Concept")
   :properties `((:pref-label :language-string-set ,(s-prefix "core:prefLabel"))
                 (:version-of :url ,(s-prefix "terms:isVersionOf")))
+                
   :resource-base (s-url "https://data.westtoer.be/id/tourist-region/")
   :on-path "tourisme-regios")
 
@@ -169,10 +174,15 @@
 
   (define-resource kwaliteitslabel ()
   :class (s-prefix "logies:Kwaliteitslabel")
-  :properties `((:label :language-string-set ,(s-prefix "core:prefLabel"))
+  :properties `(
+                ;;(:label :language-string-set ,(s-prefix "core:prefLabel"))
                 (:toegekend-op :datetime ,(s-prefix "terms:issued"))
                 (:toegekend-door :rdf-resource ,(s-prefix "schema:author"))
-                 (:type :rdf-resource ,(s-prefix "terms:type")))
+                ;;(:type :rdf-resource ,(s-prefix "terms:type"))
+                 )
+
+  :has-one `((preferred-label :via ,(s-prefix "terms:type")
+                          :as "label"))
   :resource-base (s-url "https://data.westtoer.be/id/kwaliteitslabel/")
   :on-path "kwaliteitslabels")
 
@@ -240,17 +250,28 @@
   :resource-base (s-url "https://data.westtoer.be/id/layout/")
   :on-path "layouts")
 
-(define-resource product-status ()
+
+(define-resource preferred-label ()
   :class (s-prefix "core:Concept")
-  :properties `((:version-of :rdf-resource ,(s-prefix "terms:isVersionOf")))
-  :resource-base (s-url "https://data.westtoer.be/id/product-status/")
-  :on-path "product-status")
+  :properties `((:version-of :rdf-resource ,(s-prefix "terms:isVersionOf"))
+                (:label :language-string-set ,(s-prefix "core:prefLabel"))
+                (:verwant-aan :rdf-resource ,(s-prefix "core:narrower")))
+  :resource-base (s-url "https://data.westtoer.be/id/label/")
+  :on-path "labels")
+
+
+
+
+;; merged with pref-label resource
+
+;; (define-resource product-status ()
+;;   :class (s-prefix "core:Concept")
+;;   :properties `((:version-of :rdf-resource ,(s-prefix "terms:isVersionOf")))
+;;   :resource-base (s-url "https://data.westtoer.be/id/product-status/")
+;;   :on-path "product-status")
+
 
 ;; unable to implemented
-;;   (define-resource product-status ()
-;;   :properties `((:version-of :url ,(s-prefix "terms:isVersionOf")))
-;;   :resource-base (s-url "https://data.westtoer.be/id/product-status/")
-;;   :on-path "product-statuses")
 
 ;;   (define-resource assigned-by-submunicipality ()
 ;;   :properties `((:version-of :url ,(s-prefix "terms:isVersionOf"))

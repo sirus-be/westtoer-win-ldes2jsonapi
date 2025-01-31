@@ -23,7 +23,6 @@ orchestrator:
           config:
             query: "
             
-            
             PREFIX dcmitype: <http://purl.org/dc/dcmitype/>
             PREFIX schema: <https://schema.org/>
             PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
@@ -52,8 +51,11 @@ orchestrator:
               ?o2NotBlank schema:opens ?fixedOpens .
               ?o2NotBlank schema:closes ?fixedCloses .
 
+              ?concept a skos:Concept ;
+                      mu:uuid ?conceptUuid .  
             }
             WHERE {
+            {
               {
                 ?product a dcmitype:Collection .
               }
@@ -63,34 +65,28 @@ orchestrator:
               }
 
               ?product ?p ?o .
-              FILTER (?p != skos:prefLabel)
 
               OPTIONAL {
                 ?o rdf:type ?typeO .
                 BIND(STRUUID() AS ?uuidGenerated)
+                FILTER NOT EXISTS {
+                  ?o rdf:type logies:ToeristischeRegio .
+                }
               }
-
-              BIND(
-                  IF(
-                    ISBLANK(?o) && !isLiteral(?o),
-                    IF(BOUND(?typeO), ?typeO, skos:Concept),
-                    ?oTypeNotBlank
-                  ) 
-                  AS ?oTypeNotBlank
-              )
 
               OPTIONAL {
                 ?o ?p2 ?o2 .
-                FILTER (?p2 != skos:prefLabel)
+                FILTER NOT EXISTS {
+                  ?o rdf:type logies:ToeristischeRegio .
+                }
 
                 OPTIONAL {
                     ?o2 rdf:type ?typeO2 .
                     BIND(STRUUID() AS ?uuidGeneratedO2)
                 }
-                
+
                 OPTIONAL {
                   ?o2 ?p3 ?o3 .
-                  FILTER (?p3 != skos:prefLabel)
 
                   FILTER (?p3 != <https://schema.org/opens>)
                   FILTER (?p3 != <https://schema.org/closes>)
@@ -105,10 +101,8 @@ orchestrator:
 
                   OPTIONAL {
                     ?o3 ?p4 ?o4 .
-                    FILTER (?p4 != skos:prefLabel)
                     OPTIONAL {
                         ?o4 ?p5 ?o5 .
-                        FILTER (?p5 != skos:prefLabel)
                     }
                   }
                 }
@@ -133,8 +127,18 @@ orchestrator:
               BIND(if(isBlank(?o4) && !isLiteral(?o4), URI(concat(?skolemBase, md5(concat(str(?product), str(?o4))))), ?o4) as ?o4NotBlank)
               BIND(IF(ISBLANK(?o5) && !ISLITERAL(?o5), URI(CONCAT(?skolemBase, MD5(CONCAT(STR(?product), STR(?o5))))), ?o5) AS ?o5NotBlank)
 
+            }
+            UNION
+            {
+              ?concept skos:prefLabel ?prefLabel .
+              FILTER (!isBlank(?concept))
+              FILTER NOT EXISTS {
+                  ?concept rdf:type logies:ToeristischeRegio .
               }
+              BIND(CONCAT('uuid-', SHA256(STR(?concept))) AS ?conceptUuid)
 
+            }
+          }
 
             "
       outputs:
