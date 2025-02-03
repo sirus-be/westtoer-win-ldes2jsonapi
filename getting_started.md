@@ -32,13 +32,13 @@ The API has following base URL: https://ca-proxy-westtoer-data.calmmushroom-8db0
 
 Use following URL to retrieve the first 20 (default) Westtoer products, located in the city of Brugge (NIS code 31005), with everything included:
 
-    GET /attracties?filter[adres][nis-code]=31005&include=identificator,adres,geometrie,contactpunt,contactpunt.openingsuren,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
+    GET /attracties?filter[adres][nis-code]=31005&include=identificator,adres,geometrie,contactpunt,contactpunt.openingsuren,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten,extratype
 
 NOTE: we are still in progress of mapping all fields (layout, product status...)
 
 Then, follow the "Next" page link mentioned in the response towards the next 20 products. For example:
 
-    GET /attracties?filter[adres][nis-code]=31005&page[number]=1&include=identificator,adres,geometrie,contactpunt,contactpunt.openingsuren,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
+    GET /attracties?filter[adres][nis-code]=31005&page[number]=1&include=identificator,adres,geometrie,contactpunt,contactpunt.openingsuren,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten,extratype
 
 Repeat this process until there is no "Next" link available.
 
@@ -49,7 +49,7 @@ This can be done by adding a filter parameter on generated-at-time.
 
 For example, to retrieve all updates greater than or equal to 2024-10-06: `filter[:gte:generated-at-time]=2024-10-06`
 
-    GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,geometrie,contactpunt,contactpunt.openingsuren,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten
+    GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,geometrie,contactpunt,contactpunt.openingsuren,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten,extratype
 
 You can also filter on a timestamp: `filter[:gte:generated-at-time]=2024-10-10T11:50:27Z`
 
@@ -62,13 +62,17 @@ Basic searching is done by using the `?filter` query parameter.  We can search f
 If we want to search only for names matching "Mu.ZEE", we can limit the search to that keywoard.
 
     GET /attracties?filter[naam]=Mu.ZEE
-
+    
 All of these searches are case-insensitive, and they search for any field which contain the contents (Het Mu.ZEE museum) would therefore be returned too.  We can make an exact match with a special search.
 
     GET /attracties?filter[:exact:naam]=Mu.ZEE
 
 All filter modifiers start with a colon (:) followed by the name of the filter, followed by a configuration parameter.  This specific filter will search for a name with exactly "Mu.ZEE" in its contents.  No more, no less.
 
+If we want to search on WIN ID, for example 149259:
+
+    GET /attracties?filter[identificator][win-id]=149259&include=identificator,adres,geometrie,contactpunt,contactpunt.openingsuren,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten,extratype
+    
 ## Filtering relationships
 
 Filters can also be scoped to relationships.  JSONAPI guarantees that attributes and relationships will never share a name.  Hence we can use the same syntax as we used to identify an attribute in order to identify a relationship.
