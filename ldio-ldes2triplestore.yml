@@ -41,11 +41,12 @@ orchestrator:
             CONSTRUCT {
               ?product ?p ?oNotBlank .
               ?product mu:uuid ?uuidNoDatatype .
+              ?oNotBlank a ?finalType .
               ?oNotBlank ?p2 ?o2NotBlank .
               ?o2NotBlank ?p3 ?o3NotBlank .
               ?o3NotBlank ?p4 ?o4NotBlank .
               ?o4NotBlank ?p5 ?o5NotBlank .
-              ?oNotBlank mu:uuid ?uuidGenerated .
+              ?oNotBlank mu:uuid ?finalUuid .
               ?o2NotBlank mu:uuid ?uuidGeneratedO2 .
               ?oNotBlank westtoer:identifier ?notationString .
               ?o2NotBlank schema:opens ?fixedOpens .
@@ -75,6 +76,15 @@ orchestrator:
               }
 
               OPTIONAL {
+                FILTER(?p = rdfs:seeAlso)
+                BIND(STRUUID() AS ?uuidGeneratedSeeAlso)
+                BIND(rdfs:Resource AS ?typeSeeAlso)
+                }
+
+              BIND(COALESCE(?uuidGenerated, ?uuidGeneratedSeeAlso) AS ?finalUuid)
+              BIND(COALESCE(?typeO, ?typeSeeAlso) AS ?finalType)
+
+              OPTIONAL {
                 ?o ?p2 ?o2 .
                 FILTER NOT EXISTS {
                   ?o rdf:type logies:ToeristischeRegio .
@@ -84,6 +94,8 @@ orchestrator:
                     ?o2 rdf:type ?typeO2 .
                     BIND(STRUUID() AS ?uuidGeneratedO2)
                 }
+
+                
 
                 OPTIONAL {
                   ?o2 ?p3 ?o3 .

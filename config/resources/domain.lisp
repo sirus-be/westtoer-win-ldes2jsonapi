@@ -42,7 +42,9 @@
                 (:toeristisch-relevant :boolean ,(s-prefix "westtoer:isRelevantVoorWesttoer"))
                 (:tijdelijk-gesloten :boolean ,(s-prefix "westtoer:tijdelijkGesloten"))
                 (:uitsluiten-van-jaarlijkse-bevraging :boolean ,(s-prefix "westtoer:uitsluitenVanJaarlijkseBevraging"))
-                (:uitsluiten-van-publicatie :boolean ,(s-prefix "westtoer:uitsluitenVanPublicatie")))
+                (:uitsluiten-van-publicatie :boolean ,(s-prefix "westtoer:uitsluitenVanPublicatie"))
+                (:stopgezet :boolean ,(s-prefix "westtoer:isStopgezet"))
+                (:100-procent-west-vlaams :boolean, (s-prefix "westtoer:is100ProcentWestVlaams")))
   :has-one `(
             (identificator :via ,(s-prefix "adms:identifier")
                            :as "identificator")
@@ -65,9 +67,7 @@
              (preferred-label :via ,(s-prefix "westtoer:Product.status")
                                :as "productstatus")
              (preferred-label :via ,(s-prefix "schema:additionalType")
-                          :as "extratype")
-             (preferred-label :via ,(s-prefix "rdfs:seeAlso")
-                          :as "zie-ook")        
+                          :as "extratype")      
              (preferred-label :via ,(s-prefix "westtoer:behoortTotMacroproduct")
                           :as "behoort-tot-macroproduct"))
 
@@ -78,7 +78,9 @@
               (amenity-feature :via ,(s-prefix "schema:amenityFeature")
                                 :as "faciliteiten")
               (preferred-label :via ,(s-prefix "westtoer:heeftKenmerk")
-                          :as "kenmerken"))
+                          :as "kenmerken")
+              (see-also :via ,(s-prefix "rdfs:seeAlso")
+                      :as "zie-ook"))
   :resource-base (s-url "https://data.westtoer.be/id/product/")
   :on-path "attracties")
 
@@ -258,6 +260,17 @@
                          :as "capaciteit"))
   :resource-base (s-url "https://data.westtoer.be/id/layout/")
   :on-path "layouts")
+
+
+
+
+(define-resource see-also ()
+  :class (s-prefix "rdfs:Resource")
+  :properties `((:url :url ,(s-prefix "rdfs:seeAlso")))
+  :has-one `((preferred-label :via ,(s-prefix "schema:additionalType")
+                          :as "extratype"))
+  :resource-base (s-url "https://data.westtoer.be/id/see-also/")
+  :on-path "zie-ook")
 
 
 (define-resource preferred-label ()
