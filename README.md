@@ -433,10 +433,6 @@ Aside from regular text searches, a set of custom filters have been added.  Thes
 
 - *:has:* The inverse of `:has-no:` forces the relationship to exist.  Syntax may be subject to change.
 
-- *:or:* Filters are normally combined using AND, this allows a set of filters to be defined as OR instead.
-
-    GET /attracties?filter[:or:][naam]=Mu.ZEE&[:or:][naam]=Museum
-
 
 ### Including Results
 
