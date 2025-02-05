@@ -272,7 +272,7 @@
 
 (define-resource see-also ()
   :class (s-prefix "rdfs:Resource")
-  :properties `((:url :url ,(s-prefix "rdfs:seeAlso")))
+  :properties `((:url :url ,(s-prefix "schema:url")))
   :has-one `((preferred-label :via ,(s-prefix "schema:additionalType")
                           :as "extratype"))
   :resource-base (s-url "https://data.westtoer.be/id/see-also/")
