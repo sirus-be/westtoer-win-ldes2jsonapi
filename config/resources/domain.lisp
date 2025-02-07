@@ -152,7 +152,7 @@
                 (:fax :string ,(s-prefix "schema:faxNumber"))
                 (:email :string ,(s-prefix "schema:email"))
                 (:telefoonnummer :string ,(s-prefix "schema:telephone")))
-  :has-one `((opening-hours :via ,(s-prefix "schema:hoursAvailable")
+  :has-many `((opening-hours :via ,(s-prefix "schema:hoursAvailable")
                            :as "openingsuren"))
   :resource-base (s-url "https://data.westtoer.be/id/contact-point/")
   :on-path "contactpunten")
