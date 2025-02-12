@@ -37,11 +37,11 @@ The API has following base URL: https://ca-proxy-westtoer-data.calmmushroom-8db0
 
 Use following URL to retrieve the first 20 (default) Westtoer products, located in the city of Brugge (NIS code 31005), with everything included:
 
-    GET /attracties?filter[adres][nis-code]=31005&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordeling,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook
+    GET /attracties?filter[adres][nis-code]=31005&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordeling,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook,zie-ook.extratype
 
 Then, follow the "Next" page link mentioned in the response towards the next 20 products. For example:
 
-    GET /attracties?filter[adres][nis-code]=31005&page[number]=1&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordeling,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook
+    GET /attracties?filter[adres][nis-code]=31005&page[number]=1&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordeling,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook,zie-ook.extratype
 
 Repeat this process until there is no "Next" link available.
 
@@ -52,7 +52,7 @@ This can be done by adding a filter parameter on generated-at-time.
 
 For example, to retrieve all updates greater than or equal to 2024-10-06: `filter[:gte:generated-at-time]=2024-10-06`
 
-    GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordeling,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook
+    GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordeling,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook,zie-ook.extratype
 
 You can also filter on a timestamp: `filter[:gte:generated-at-time]=2024-10-10T11:50:27Z`
 
@@ -74,7 +74,7 @@ All filter modifiers start with a colon (:) followed by the name of the filter, 
 
 If we want to search on WIN ID, for example 149259:
 
-    GET /attracties?filter[identificator][win-id]=149259&include=identificator,adres,geometrie,contactpunt,contactpunt.openingsuren,tourismeRegio,beoordeling,registratie,prijs,media,kwaliteitslabels,faciliteiten,extratype
+    GET /attracties?filter[identificator][win-id]=149259&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordeling,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook,zie-ook.extratype
     
 ## Filtering relationships
 
