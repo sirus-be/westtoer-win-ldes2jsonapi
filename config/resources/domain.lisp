@@ -1,6 +1,15 @@
 (in-package :mu-cl-resources)
 (setf *allow-xsd-in-uuids* t)
 
+;; Internal caching
+(setf *cache-model-properties* t)
+(setf *cache-count-queries* t)
+(setf *cache-model-properties-p* t)
+
+;; External Caching//use when combined with mu-cache
+;;(setf *supply-cache-headers-p* t)
+
+
 ;;
 ;; NOTE
 ;; docker-compose stop; docker-compose rm; docker-compose up
