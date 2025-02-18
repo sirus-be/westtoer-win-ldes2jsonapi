@@ -81,13 +81,6 @@ orchestrator:
               }
 
               OPTIONAL {
-                ?o rdf:type logies:Faciliteit .
-                ?o logies:isSpecialisatieVan ?faciliteitUrl .
-                BIND(REPLACE(STR(?faciliteitUrl), 'https://data.westtoer.be/id/concepts/', '') AS ?faciliteitId)
-                BIND(CONCAT('uuid-',STR(?faciliteitId)) AS ?uuidFaciliteit)
-              }
-
-              OPTIONAL {
                 ?o rdf:type adms:Identifier .
                 ?o skos:notation       ?wincode .
                 BIND(CONCAT('uuid-',STR(?wincode)) AS ?uuidIdentifier)
