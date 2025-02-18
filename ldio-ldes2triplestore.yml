@@ -6,7 +6,7 @@ orchestrator:
         name: Ldio:LdesClient
         config:
           urls:
-            - https://ca-westtoer-ldes.bluesea-b3dcdb70.westeurope.azurecontainerapps.io/touristattractions
+            - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions/latestView?pageNumber=1
           sourceFormat: text/turtle
           keep-state: true
           state: sqlite
@@ -37,6 +37,7 @@ orchestrator:
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX logies: <https://data.vlaanderen.be/ns/logies#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX adms:  <http://www.w3.org/ns/adms#>
 
             CONSTRUCT {
               ?product ?p ?oNotBlank .
@@ -68,6 +69,33 @@ orchestrator:
               ?product ?p ?o .
 
               OPTIONAL {
+                ?o generiek:lokaleIdentificator ?uuidMediaRaw .
+                BIND(CONCAT('uuid-',STR(?uuidMediaRaw)) AS ?uuidMedia)
+              }
+
+              OPTIONAL {
+                ?o rdf:type logies:Faciliteit .
+                ?o logies:isSpecialisatieVan ?faciliteitUrl .
+                BIND(REPLACE(STR(?faciliteitUrl), 'https://data.westtoer.be/id/concepts/', '') AS ?faciliteitId)
+                BIND(CONCAT('uuid-',STR(?faciliteitId)) AS ?uuidFaciliteit)
+              }
+
+              OPTIONAL {
+                ?o rdf:type logies:Faciliteit .
+                ?o logies:isSpecialisatieVan ?faciliteitUrl .
+                BIND(REPLACE(STR(?faciliteitUrl), 'https://data.westtoer.be/id/concepts/', '') AS ?faciliteitId)
+                BIND(CONCAT('uuid-',STR(?faciliteitId)) AS ?uuidFaciliteit)
+              }
+
+              OPTIONAL {
+                ?o rdf:type adms:Identifier .
+                ?o skos:notation       ?wincode .
+                BIND(CONCAT('uuid-',STR(?wincode)) AS ?uuidIdentifier)
+              }
+
+
+
+              OPTIONAL {
                 ?o rdf:type ?typeO .
                 BIND(STRUUID() AS ?uuidGenerated)
                 FILTER NOT EXISTS {
@@ -81,7 +109,7 @@ orchestrator:
                 BIND(rdfs:Resource AS ?typeSeeAlso)
                 }
 
-              BIND(COALESCE(?uuidGenerated, ?uuidGeneratedSeeAlso) AS ?finalUuid)
+              BIND(COALESCE(?uuidMedia, ?uuidFaciliteit, ?uuidIdentifier, ?uuidGenerated, ?uuidGeneratedSeeAlso) AS ?finalUuid)
               BIND(COALESCE(?typeO, ?typeSeeAlso) AS ?finalType)
 
               OPTIONAL {
