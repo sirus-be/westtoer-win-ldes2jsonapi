@@ -35,16 +35,13 @@ This means that the identifier only changes when the value changes.
 When the identifier does not start with `uuid-` (except with the identifier of an attraction), the identifier changes when there is a product update or a redeployment takes place.
 
 Following resource types don't have stable identifiers:
-* adressen
+
+* openingsuren
 * beoordelingen
-* capaciteit
-* contactpunten
-* geometries
-* kwaliteitslabels
-* prijzen
-* registraties
 * ruimtes
-* zie-ook
+* ruimte-afmetingen
+* layouts
+
 
 ## Basic harvesting
 
