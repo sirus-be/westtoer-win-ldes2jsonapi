@@ -292,7 +292,8 @@
   :class (s-prefix "core:Concept")
   :properties `((:version-of :rdf-resource ,(s-prefix "terms:isVersionOf"))
                 (:label :language-string-set ,(s-prefix "core:prefLabel"))
-                (:verwant-aan :rdf-resource ,(s-prefix "core:narrower")))
+                (:verwant-aan :rdf-resource ,(s-prefix "core:narrower"))
+                (:is-verwijderd :boolean ,(s-prefix "westtoer:isDeleted")))
   :resource-base (s-url "https://data.westtoer.be/id/label/")
   :on-path "labels")
 
