@@ -52,12 +52,8 @@ orchestrator:
               ?oNotBlank westtoer:identifier ?notationString .
               ?o2NotBlank schema:opens ?fixedOpens .
               ?o2NotBlank schema:closes ?fixedCloses .
-
-              ?concept a skos:Concept ;
-                      mu:uuid ?conceptUuid .  
             }
             WHERE {
-            {
               {
                 ?product a dcmitype:Collection .
               }
@@ -161,18 +157,27 @@ orchestrator:
               BIND(IF(ISBLANK(?o5) && !ISLITERAL(?o5), URI(CONCAT(?skolemBase, MD5(CONCAT(STR(?product), STR(?o5))))), ?o5) AS ?o5NotBlank)
 
             }
-            UNION
-            {
-              ?concept skos:prefLabel ?prefLabel .
-              FILTER (!isBlank(?concept))
-              FILTER NOT EXISTS {
-                  ?concept rdf:type logies:ToeristischeRegio .
+            "
+        - name: "Ldio:SparqlConstructTransformer"
+          config:
+            query: "
+            PREFIX logies: <https://data.vlaanderen.be/ns/logies#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+            CONSTRUCT {
+              GRAPH ?s {
+                ?s ?p ?o .
               }
-              BIND(CONCAT('uuid-', SHA256(STR(?concept))) AS ?conceptUuid)
-
             }
-          }
-
+            WHERE {
+              ?s ?p ?o .
+              FILTER NOT EXISTS {
+                ?s a skos:Concept .
+              }
+              FILTER NOT EXISTS {
+                ?s a logies:ToeristischeRegio .
+              }               
+            }
             "
       outputs:
         # - name: Ldio:ConsoleOut
@@ -223,6 +228,10 @@ orchestrator:
                   "labelGerman": {
                       "@id": "label",
                       "@language": "de"
+                  },
+                  "isDeleted": {
+                      "@id": "https://data.westtoer.be/ns#isDeleted",
+                      "@type": "http://www.w3.org/2001/XMLSchema#boolean"
                   }
                 }
               }
