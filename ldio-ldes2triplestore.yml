@@ -38,6 +38,8 @@ orchestrator:
             PREFIX logies: <https://data.vlaanderen.be/ns/logies#>
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             PREFIX adms:  <http://www.w3.org/ns/adms#>
+            PREFIX terms: <http://purl.org/dc/terms/>
+            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
             CONSTRUCT {
               ?product ?p ?oNotBlank .
@@ -66,23 +68,166 @@ orchestrator:
 
               OPTIONAL {
                 ?o generiek:lokaleIdentificator ?uuidMediaRaw .
-                BIND(CONCAT('uuid-',STR(?uuidMediaRaw)) AS ?uuidMedia)
+                BIND(CONCAT('uuid-',STR(?uuidMediaRaw)) AS ?uuidStatic)
               }
 
               OPTIONAL {
                 ?o rdf:type logies:Faciliteit .
                 ?o logies:isSpecialisatieVan ?faciliteitUrl .
                 BIND(REPLACE(STR(?faciliteitUrl), 'https://data.westtoer.be/id/concepts/', '') AS ?faciliteitId)
-                BIND(CONCAT('uuid-',STR(?faciliteitId)) AS ?uuidFaciliteit)
+                BIND(CONCAT('uuid-',STR(?faciliteitId)) AS ?uuidStatic)
               }
 
               OPTIONAL {
                 ?o rdf:type adms:Identifier .
                 ?o skos:notation       ?wincode .
-                BIND(CONCAT('uuid-',STR(?wincode)) AS ?uuidIdentifier)
+                BIND(CONCAT('uuid-',STR(?wincode)) AS ?uuidStatic)
               }
 
+              OPTIONAL {
+                ?o rdf:type logies:Kwaliteitslabel .
+                ?o skos:prefLabel ?kwalLabel .
+                ?o schema:author ?kwalauthor .
+                ?o terms:issued ?kwalissued .
+                ?o terms:type ?kwaltype .
 
+                BIND(
+                  CONCAT('uuid-', MD5(CONCAT(STR(?kwalLabel), STR(?kwalauthor), STR(?kwalissued), STR(?kwaltype))))
+                  AS ?uuidStatic
+                )
+              }
+
+              OPTIONAL {
+                ?o rdf:type generiek:Geometrie.
+                ?o wgs84_pos:lat ?geoLat .
+                ?o wgs84_pos:long ?geoLong .
+       
+
+                BIND(
+                  CONCAT('uuid-', MD5(CONCAT(STR(?geoLat), STR(?geoLong))))
+                  AS ?uuidStatic
+                )
+              }
+
+              OPTIONAL {
+                ?o rdf:type schema:QuantitativeValue.
+                ?o schema:unitText ?qvUnitText .
+                ?o schema:value ?qvValue .
+                OPTIONAL {
+                  ?o schema:unitCode ?qvCode .
+                }
+       
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?qvUnitText), ''),
+                      COALESCE(STR(?qvValue), ''),
+                      COALESCE(STR(?qvCode), '')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )
+              }
+
+              OPTIONAL {
+                ?o rdf:type schema:MonetaryAmount.
+                ?o schema:currency ?MonCur .
+                
+                OPTIONAL{
+                  ?o schema:value ?MonVal .
+                }
+  
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?MonCur), ''),
+                      COALESCE(STR(?MonVal), '')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )
+              }
+
+              OPTIONAL {
+                ?o rdf:type schema:ContactPoint.
+
+                OPTIONAL {
+                  ?o foaf:page ?contactPage .
+                }
+                OPTIONAL {
+                  ?o schema:email ?contactEmail .
+                }
+                OPTIONAL {
+                  ?o schema:telephone ?contactTelephone .
+                }
+  
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?contactPage), 'ContactPoint'),
+                      COALESCE(STR(?contactEmail), ''),
+                      COALESCE(STR(?contactTelephone), '')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )
+              }
+
+              OPTIONAL{
+                ?o rdf:type logies:Registratie.
+                ?o adms:identifier ?regId .
+                ?o prov:wasAssociatedWith ?regAssoc .
+                ?regId skos:notation ?regNotation .
+                
+
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?regNotation), 'Registratie'),
+                      COALESCE(STR(?regAssoc),'')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )              
+              }
+
+              OPTIONAL{
+                ?o rdf:type locn:Address.
+                ?o westtoer:adresregel1 ?adresregel1 .
+                ?o locn:postCode ?postcode .
+                ?o westtoer:gemeenteniscode ?gemeenteniscode .
+
+                OPTIONAL{
+                  ?o westtoer:isToegekendDoorDeelgemeente ?deelgemeente .
+                }
+
+                OPTIONAL{
+                  ?o westtoer:isToegekendDoorGemeente ?gemeente .
+                }
+
+                OPTIONAL{
+                  ?o westtoer:isToegekendDoorProvincie ?provincie .
+                }
+                
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?adresregel1), 'Address'),
+                      COALESCE(STR(?postcode), ''),
+                      COALESCE(STR(?gemeenteniscode), ''),
+                      COALESCE(STR(?deelgemeente), ''),
+                      COALESCE(STR(?gemeente), ''),
+                      COALESCE(STR(?provincie), '')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )
+              }
 
               OPTIONAL {
                 ?o rdf:type ?typeO .
@@ -98,7 +243,7 @@ orchestrator:
                 BIND(rdfs:Resource AS ?typeSeeAlso)
                 }
 
-              BIND(COALESCE(?uuidMedia, ?uuidFaciliteit, ?uuidIdentifier, ?uuidGenerated, ?uuidGeneratedSeeAlso) AS ?finalUuid)
+              BIND(COALESCE(?uuidStatic, ?uuidGenerated, ?uuidGeneratedSeeAlso) AS ?finalUuid)
               BIND(COALESCE(?typeO, ?typeSeeAlso) AS ?finalType)
 
               OPTIONAL {
@@ -146,7 +291,6 @@ orchestrator:
                 ?o skos:notation ?notation .
                 BIND(STR(?notation) AS ?notationString)
               }
-
 
 
               BIND('https://data.westtoer.be/id/.well-known/genid/' as ?skolemBase)
@@ -379,7 +523,7 @@ orchestrator:
             repository-id: virtuoso
             named-graph: http://mu.semte.ch/application
             batch-timeout: 10000
-            batch-size: 10
+            batch-size: 1
 
     - name: touristregions
       description: "This pipeline will fetch the tourist-regions."

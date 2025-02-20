@@ -112,9 +112,9 @@
 
 ;; assigned-by-x resources do not have a class in the triplestore, which complicates assigning a UUID using the sparql construct query. Which is why they are not implemented.
 
-  (define-resource address ()
-  :class (s-prefix "locn:Address")
-  :properties `((:provincie :language-string-set ,(s-prefix "locn:adminUnitL2"))
+(define-resource address ()
+:class (s-prefix "locn:Address")
+:properties `((:provincie :language-string-set ,(s-prefix "locn:adminUnitL2"))
                 (:post-code :string ,(s-prefix "locn:postCode"))
                 (:straat :language-string ,(s-prefix "locn:thoroughfare"))
                 (:huisnummer :string ,(s-prefix "adres:Adresvoorstelling.huisnummer"))
@@ -157,10 +157,12 @@
   (define-resource contact-point ()
   :class (s-prefix "schema:ContactPoint")
   :properties `((:website :uri ,(s-prefix "foaf:page"))
-                (:type :string ,(s-prefix "schema:contactType"))
+                ;;(:type :string ,(s-prefix "schema:contactType"))
                 (:fax :string ,(s-prefix "schema:faxNumber"))
                 (:email :string ,(s-prefix "schema:email"))
                 (:telefoonnummer :string ,(s-prefix "schema:telephone")))
+  :has-one `((preferred-label :via ,(s-prefix "schema:contactType")
+                          :as "type"))
   :has-many `((opening-hours :via ,(s-prefix "schema:hoursAvailable")
                            :as "openingsuren"))
   :resource-base (s-url "https://data.westtoer.be/id/contact-point/")
@@ -168,14 +170,14 @@
 
 
 (define-resource opening-hours ()
-  :class (s-prefix "schema:OpeningHoursSpecification")
-  :properties `((:sluit :string ,(s-prefix "schema:closes"))
-                (:open :string ,(s-prefix "schema:opens"))
-                (:dag :rdf-resource ,(s-prefix "schema:dayOfWeek"))
-                (:geldig-van :datetime ,(s-prefix "schema:validFrom"))
-                (:geldig-tot :datetime ,(s-prefix "schema:validThrough")))
-  :resource-base (s-url "https://data.westtoer.be/id/opening-hours/")
-  :on-path "openingsuren")
+:class (s-prefix "schema:OpeningHoursSpecification")
+:properties `((:sluit :string ,(s-prefix "schema:closes"))
+              (:open :string ,(s-prefix "schema:opens"))
+              (:dag :rdf-resource ,(s-prefix "schema:dayOfWeek"))
+              (:geldig-van :datetime ,(s-prefix "schema:validFrom"))
+              (:geldig-tot :datetime ,(s-prefix "schema:validThrough")))
+:resource-base (s-url "https://data.westtoer.be/id/opening-hours/")
+:on-path "openingsuren")
 
 
   (define-resource media ()
