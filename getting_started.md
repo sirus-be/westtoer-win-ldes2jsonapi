@@ -36,7 +36,6 @@ When the identifier does not start with `uuid-` (except with the identifier of a
 
 Following resource types don't have stable identifiers:
 
-* openingsuren
 * ruimtes
 * ruimte-afmetingen
 * layouts

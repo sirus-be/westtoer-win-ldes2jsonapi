@@ -192,9 +192,10 @@
 
 (define-resource amenity-feature ()
   :class (s-prefix "logies:Faciliteit")
-  :properties `((:specialisatie-van :url ,(s-prefix "logies:isSpecialisatieVan"))
-                (:is-verwijderd :boolean ,(s-prefix "westtoer:isDeleted"))
+  :properties `((:is-verwijderd :boolean ,(s-prefix "westtoer:isDeleted"))
                 (:naam :language-string-set ,(s-prefix "schema:name")))
+  :has-one `((preferred-label :via ,(s-prefix "logies:isSpecialisatieVan")
+                          :as "specialisatie-van"))
   :resource-base (s-url "https://data.westtoer.be/id/amenity-feature/")
   :on-path "faciliteiten")
 
