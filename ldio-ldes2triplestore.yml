@@ -75,18 +75,12 @@ orchestrator:
               OPTIONAL {
                 ?o rdf:type logies:Faciliteit .
                 ?o logies:isSpecialisatieVan ?faciliteitUrl .
-                ?o schema:name ?faciliteitName .                
-                OPTIONAL {
-                  ?o westtoer:isDeleted ?faciliteitIsDeleted .
-                }
 
                 BIND(
                   CONCAT(
                     'uuid-',
                     MD5(CONCAT(
                       COALESCE(STR(?faciliteitUrl), ''),
-                      COALESCE(STR(?faciliteitName), ''),
-                      COALESCE(STR(?faciliteitIsDeleted), '')
                     ))
                   )
                   AS ?uuidStatic
