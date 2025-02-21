@@ -28,18 +28,6 @@ Currently, the following resource types and endpoints are defined:
 - **zie-ook**
 - **labels**
 
-## Stable identifiers
-
-Identifiers (`id: "..."`) that start with `uuid-` can be considered as stable identifiers.
-This means that the identifier only changes when the value changes.
-When the identifier does not start with `uuid-` (except with the identifier of an attraction), the identifier changes when there is a product update or a redeployment takes place.
-
-Following resource types don't have stable identifiers:
-
-* ruimtes
-* ruimte-afmetingen
-* layouts
-
 
 ## Basic harvesting
 

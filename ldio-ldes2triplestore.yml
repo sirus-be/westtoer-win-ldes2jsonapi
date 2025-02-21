@@ -40,6 +40,7 @@ orchestrator:
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX terms: <http://purl.org/dc/terms/>
             PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            PREFIX datatourisme: <https://www.datatourisme.fr/ontology/core#>
 
             CONSTRUCT {
               ?product ?p ?oNotBlank .
@@ -126,7 +127,9 @@ orchestrator:
               OPTIONAL {
                 ?o rdf:type schema:QuantitativeValue.
                 ?o schema:unitText ?qvUnitText .
-                ?o schema:value ?qvValue .
+                OPTIONAL{
+                  ?o schema:value ?qvValue .
+                }
                 OPTIONAL {
                   ?o schema:unitCode ?qvCode .
                 }
@@ -270,6 +273,51 @@ orchestrator:
                 )
               }
 
+              OPTIONAL{
+                ?o rdf:type datatourisme:MultiPurposeRoomOrCommunityRoom.
+
+                OPTIONAL{
+                  ?o westtoer:aantalSubzalen ?aantalSubzalen .
+                }
+
+                ?o schema:floorSize ?floorSize .
+                ?o schema:height ?height .
+
+                OPTIONAL{
+                  ?floorSize schema:unitCode ?floorSizeUnitCode .
+                  ?floorSize schema:unitText ?floorSizeUnitText .
+
+                  OPTIONAL{
+                    ?floorSize schema:value ?floorSizeValue .
+                  }
+                }
+               
+                OPTIONAL{
+                  ?height schema:unitCode ?heightUnitCode .
+                  ?height schema:unitText ?heightUnitText .
+
+                  OPTIONAL{
+                    ?height schema:value ?heightValue .
+                  }
+                }
+
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?aantalSubzalen), ''),
+                      COALESCE(STR(?floorSizeUnitCode), ''),
+                      COALESCE(STR(?floorSizeUnitText), ''),
+                      COALESCE(STR(?floorSizeValue), ''),
+                      COALESCE(STR(?heightUnitCode), ''),
+                      COALESCE(STR(?heightUnitText), ''),
+                      COALESCE(STR(?heightValue), '')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )
+              }
+
               OPTIONAL {
                 ?o rdf:type ?typeO .
                 BIND(STRUUID() AS ?uuidGenerated)
@@ -280,11 +328,26 @@ orchestrator:
 
               OPTIONAL {
                 FILTER(?p = rdfs:seeAlso)
-                BIND(STRUUID() AS ?uuidGeneratedSeeAlso)
                 BIND(rdfs:Resource AS ?typeSeeAlso)
-                }
 
-              BIND(COALESCE(?uuidStatic, ?uuidGenerated, ?uuidGeneratedSeeAlso) AS ?finalUuid)
+                OPTIONAL {
+                  ?o schema:url ?resourceUrl .
+                }
+                ?o schema:additionalType ?resourceAddType .
+
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?resourceUrl), ''),
+                      COALESCE(STR(?resourceAddType), '')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )      
+              }
+
+              BIND(COALESCE(?uuidStatic, ?uuidGenerated) AS ?finalUuid)
               BIND(COALESCE(?typeO, ?typeSeeAlso) AS ?finalType)
 
               OPTIONAL {
@@ -313,7 +376,7 @@ orchestrator:
                   
                   BIND(
                     CONCAT(
-                      'hours-',
+                      'uuid-',
                       MD5(CONCAT(
                         COALESCE(STR(?dayOfWeek), ''),
                         COALESCE(STR(?opens), ''),
@@ -323,8 +386,65 @@ orchestrator:
                       ))
                     )
                     AS ?uuidStaticO2
-                  )
+                  )   
+                }
+
+                OPTIONAL {
+                  ?o2 rdf:type datatourisme:RoomLayout .
+                  OPTIONAL{
+                    ?o2 westtoer:indelingBeschikbaar ?layoutIndelingBeschikbaar .
+                  }
+                  OPTIONAL{
+                    ?o2 logies:capaciteit ?layoutCapaciteit .
+                    OPTIONAL{      
+                      ?layoutCapaciteit schema:unitText ?layoutCapaciteitText .
+                        OPTIONAL{
+                          ?layoutCapaciteit schema:unitCode ?layoutCapaciteitCode .
+                        }
+                        OPTIONAL{
+                          ?layoutCapaciteit schema:value ?layoutCapaciteitValue .
+                          }
+                        }
+                    }
+                  
+                    BIND(
+                      CONCAT(
+                        'uuid-',
+                        MD5(CONCAT(
+                          COALESCE(STR(?layoutIndelingBeschikbaar), ''),
+                          COALESCE(STR(?layoutCapaciteitText), ''),
+                          COALESCE(STR(?layoutCapaciteitCode), ''),
+                          COALESCE(STR(?layoutCapaciteitValue), '')
+                        ))
+                      )
+                      AS ?uuidStaticO2
+                    )
+                }
+
+                OPTIONAL {
+                  ?o2 rdf:type schema:ContactPoint.
+
+                  OPTIONAL {
+                    ?o2 foaf:page ?contactPageO2 .
+                  }
+                  OPTIONAL {
+                    ?o2 schema:email ?contactEmailO2 .
+                  }
+                  OPTIONAL {
+                    ?o2 schema:telephone ?contactTelephoneO2 .
+                  }
     
+                  BIND(
+                    CONCAT(
+                      'uuid-',
+                      MD5(CONCAT(
+                        COALESCE(STR(?contactPageO2), 'ContactPoint'),
+                        COALESCE(STR(?contactEmailO2), ''),
+                        COALESCE(STR(?contactTelephoneO2), '')
+                      ))
+                    )
+                    AS ?uuidStaticO2
+                  )
                 }
 
                 OPTIONAL {
