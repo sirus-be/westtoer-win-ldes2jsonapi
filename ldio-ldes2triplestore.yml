@@ -80,7 +80,7 @@ orchestrator:
                   CONCAT(
                     'uuid-',
                     MD5(CONCAT(
-                      COALESCE(STR(?faciliteitUrl), ''),
+                      COALESCE(STR(?faciliteitUrl), '')
                     ))
                   )
                   AS ?uuidStatic
