@@ -36,7 +36,6 @@
 ;;   :on-path "<url-path-on-which-this-resource-is-available>")
 
 
-;; correct
 (define-resource tourist-attraction ()
   :class (s-prefix "schema:TouristAttraction")
   :properties `((:naam :language-string-set ,(s-prefix "schema:name"))
@@ -67,8 +66,6 @@
                        :as "geometrie")
              (contact-point :via ,(s-prefix "schema:contactPoint")
                             :as "contactpunt")
-             (star-rating :via ,(s-prefix "schema:starRating")
-                          :as "beoordeling")
              (tourist-region :via ,(s-prefix "logies:behoortTotToeristischeRegio")
                              :as "tourismeRegio")
              (registration :via ,(s-prefix "logies:heeftRegistratie")
@@ -90,6 +87,8 @@
                                 :as "kwaliteitslabels")
               (amenity-feature :via ,(s-prefix "schema:amenityFeature")
                                 :as "faciliteiten")
+             (star-rating :via ,(s-prefix "schema:starRating")
+                          :as "beoordelingen")
               (preferred-label :via ,(s-prefix "westtoer:heeftKenmerk")
                           :as "kenmerken")
               (multipurpose-room :via ,(s-prefix "westtoer:heeftRuimte")
@@ -100,7 +99,7 @@
   :on-path "attracties")
 
 
-  (define-resource identificator ()
+(define-resource identificator ()
   :class (s-prefix "adms:Identifier")
   :properties `((:aangemaakt-door :rdf-resource ,(s-prefix "terms:creator"))
                 (:win-id :string ,(s-prefix  "westtoer:identifier"))
@@ -110,34 +109,33 @@
 
 
 
-;; assigned-by-x resources do not have a class in the triplestore, which complicates assigning a UUID using the sparql construct query. Which is why they are not implemented.
 
 (define-resource address ()
-:class (s-prefix "locn:Address")
-:properties `((:provincie :language-string-set ,(s-prefix "locn:adminUnitL2"))
-                (:post-code :string ,(s-prefix "locn:postCode"))
-                (:straat :language-string ,(s-prefix "locn:thoroughfare"))
-                (:huisnummer :string ,(s-prefix "adres:Adresvoorstelling.huisnummer"))
-                (:gemeente :language-string ,(s-prefix "adres:gemeentenaam"))
-                (:land :language-string ,(s-prefix "adres:land"))
-                (:adres-regel-1 :string ,(s-prefix "westtoer:adresregel1"))
-                (:nis-code :integer ,(s-prefix "westtoer:gemeenteniscode"))
-                (:toegekend-door-gemeente-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorGemeente"))
-                (:toegekend-door-deelgemeente-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorDeelgemeente"))
-                (:toegekend-door-provincie-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorProvincie"))
-                )
-  :has-one `((preferred-label :via ,(s-prefix "westtoer:isToegekendDoorGemeente")
-                                        :as "toegekend-door-gemeente")
-              (preferred-label  :via ,(s-prefix "westtoer:isToegekendDoorDeelgemeente")
-                                        :as "toegekend-door-deelgemeente")
-              (preferred-label  :via ,(s-prefix "westtoer:isToegekendDoorProvincie")
-                                    :as "toegekend-door-provincie"))
+  :class (s-prefix "locn:Address")
+  :properties `((:provincie :language-string-set ,(s-prefix "locn:adminUnitL2"))
+                  (:post-code :string ,(s-prefix "locn:postCode"))
+                  (:straat :language-string ,(s-prefix "locn:thoroughfare"))
+                  (:huisnummer :string ,(s-prefix "adres:Adresvoorstelling.huisnummer"))
+                  (:gemeente :language-string ,(s-prefix "adres:gemeentenaam"))
+                  (:land :language-string ,(s-prefix "adres:land"))
+                  (:adres-regel-1 :string ,(s-prefix "westtoer:adresregel1"))
+                  (:nis-code :integer ,(s-prefix "westtoer:gemeenteniscode"))
+                  (:toegekend-door-gemeente-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorGemeente"))
+                  (:toegekend-door-deelgemeente-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorDeelgemeente"))
+                  (:toegekend-door-provincie-uri :rdf-resource ,(s-prefix "westtoer:isToegekendDoorProvincie"))
+                  )
+    :has-one `((preferred-label :via ,(s-prefix "westtoer:isToegekendDoorGemeente")
+                                          :as "toegekend-door-gemeente")
+                (preferred-label  :via ,(s-prefix "westtoer:isToegekendDoorDeelgemeente")
+                                          :as "toegekend-door-deelgemeente")
+                (preferred-label  :via ,(s-prefix "westtoer:isToegekendDoorProvincie")
+                                      :as "toegekend-door-provincie"))
 
-  :resource-base (s-url "https://data.westtoer.be/id/address/")
-  :on-path "adressen")
+    :resource-base (s-url "https://data.westtoer.be/id/address/")
+    :on-path "adressen")
 
 
-  (define-resource geometry ()
+(define-resource geometry ()
   :class (s-prefix "generiek:Geometrie")
   :properties `((:latitude :xsd-secure-double ,(s-prefix "wgs84_pos:lat"))
                 (:longitude :xsd-secure-double ,(s-prefix "wgs84_pos:long")))
@@ -145,7 +143,7 @@
   :on-path "geometries")
 
 
-  (define-resource tourist-region ()
+(define-resource tourist-region ()
   :class (s-prefix "core:Concept")
   :properties `((:pref-label :language-string-set ,(s-prefix "core:prefLabel"))
                 (:version-of :url ,(s-prefix "terms:isVersionOf")))
@@ -154,7 +152,7 @@
   :on-path "tourisme-regios")
 
 
-  (define-resource contact-point ()
+(define-resource contact-point ()
   :class (s-prefix "schema:ContactPoint")
   :properties `((:website :uri ,(s-prefix "foaf:page"))
                 ;;(:type :string ,(s-prefix "schema:contactType"))
@@ -170,17 +168,17 @@
 
 
 (define-resource opening-hours ()
-:class (s-prefix "schema:OpeningHoursSpecification")
-:properties `((:sluit :string ,(s-prefix "schema:closes"))
-              (:open :string ,(s-prefix "schema:opens"))
-              (:dag :rdf-resource ,(s-prefix "schema:dayOfWeek"))
-              (:geldig-van :datetime ,(s-prefix "schema:validFrom"))
-              (:geldig-tot :datetime ,(s-prefix "schema:validThrough")))
-:resource-base (s-url "https://data.westtoer.be/id/opening-hours/")
-:on-path "openingsuren")
+  :class (s-prefix "schema:OpeningHoursSpecification")
+  :properties `((:sluit :string ,(s-prefix "schema:closes"))
+                (:open :string ,(s-prefix "schema:opens"))
+                (:dag :rdf-resource ,(s-prefix "schema:dayOfWeek"))
+                (:geldig-van :datetime ,(s-prefix "schema:validFrom"))
+                (:geldig-tot :datetime ,(s-prefix "schema:validThrough")))
+  :resource-base (s-url "https://data.westtoer.be/id/opening-hours/")
+  :on-path "openingsuren")
 
 
-  (define-resource media ()
+(define-resource media ()
   :class (s-prefix "logies:MediaObject")
   :properties `((:lokale-identificator :rdfs-string ,(s-prefix "generiek:lokaleIdentificator"))
                 (:naamruimte :rdfs-string ,(s-prefix "generiek:naamruimte"))
@@ -192,15 +190,16 @@
   :resource-base (s-url "https://data.westtoer.be/id/media/")
   :on-path "media")
 
-  (define-resource amenity-feature ()
+(define-resource amenity-feature ()
   :class (s-prefix "logies:Faciliteit")
   :properties `((:specialisatie-van :url ,(s-prefix "logies:isSpecialisatieVan"))
+                (:is-verwijderd :boolean ,(s-prefix "westtoer:isDeleted"))
                 (:naam :language-string-set ,(s-prefix "schema:name")))
   :resource-base (s-url "https://data.westtoer.be/id/amenity-feature/")
   :on-path "faciliteiten")
 
 
-  (define-resource kwaliteitslabel ()
+(define-resource kwaliteitslabel ()
   :class (s-prefix "logies:Kwaliteitslabel")
   :properties `(
                 ;;(:label :language-string-set ,(s-prefix "core:prefLabel"))
@@ -215,13 +214,13 @@
   :on-path "kwaliteitslabels")
 
 
-  (define-resource registration ()
+(define-resource registration ()
   :class (s-prefix "logies:Registratie")
   :properties `((:geassocieerd-aan :rdf-resource ,(s-prefix "prov:wasAssociatedWith")))
   :resource-base (s-url "https://data.westtoer.be/id/registration/")
   :on-path "registraties")
 
-  (define-resource star-rating ()
+(define-resource star-rating ()
   :class (s-prefix "schema:Rating")
   :properties `((:type :url ,(s-prefix "terms:type"))
                 (:auteur :url ,(s-prefix "schema:author"))
@@ -240,12 +239,14 @@
   :on-path "prijzen")
 
 
-  (define-resource capacity ()
+(define-resource capacity ()
   :class (s-prefix "schema:QuantitativeValue")
   :properties `((:aantal :string ,(s-prefix "schema:unitText"))
                 (:eenheid :number ,(s-prefix "schema:value")))
   :resource-base (s-url "https://data.westtoer.be/id/capacity/")
   :on-path "capaciteiten")
+
+
 
 
 ;; room and room-layout
@@ -279,8 +280,7 @@
   :on-path "layouts")
 
 
-
-
+;; labels
 (define-resource see-also ()
   :class (s-prefix "rdfs:Resource")
   :properties `((:url :url ,(s-prefix "schema:url")))
@@ -298,35 +298,3 @@
                 (:is-verwijderd :boolean ,(s-prefix "westtoer:isDeleted")))
   :resource-base (s-url "https://data.westtoer.be/id/label/")
   :on-path "labels")
-
-
-
-
-;; merged with pref-label resource
-
-;; (define-resource product-status ()
-;;   :class (s-prefix "core:Concept")
-;;   :properties `((:version-of :rdf-resource ,(s-prefix "terms:isVersionOf")))
-;;   :resource-base (s-url "https://data.westtoer.be/id/product-status/")
-;;   :on-path "product-status")
-
-
-;; unable to implemented
-
-;;   (define-resource assigned-by-submunicipality ()
-;;   :properties `((:version-of :url ,(s-prefix "terms:isVersionOf"))
-;;                 (:pref-label :language-string-set ,(s-prefix "core:prefLabel")))
-;;   :resource-base (s-url "https://data.westtoer.be/id/assigned-by-submunicipality/")
-;;   :on-path "assigned-by-submunicipalities")
-
-;; (define-resource assigned-by-municipality ()
-;;   :properties `((:version-of :url ,(s-prefix "terms:isVersionOf"))
-;;                 (:pref-label :language-string-set ,(s-prefix "core:prefLabel")))
-;;   :resource-base (s-url "https://data.westtoer.be/id/assigned-by-municipality/")
-;;   :on-path "assigned-by-municipalities")
-
-;; (define-resource assigned-by-province ()
-;;   :properties `((:version-of :url ,(s-prefix "terms:isVersionOf"))
-;;                 (:pref-label :language-string-set ,(s-prefix "core:prefLabel")))
-;;   :resource-base (s-url "https://data.westtoer.be/id/assigned-by-province/")
-;;   :on-path "assigned-by-provinces")

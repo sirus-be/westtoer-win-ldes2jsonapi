@@ -40,6 +40,7 @@ orchestrator:
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX terms: <http://purl.org/dc/terms/>
             PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            PREFIX datatourisme: <https://www.datatourisme.fr/ontology/core#>
 
             CONSTRUCT {
               ?product ?p ?oNotBlank .
@@ -50,7 +51,7 @@ orchestrator:
               ?o3NotBlank ?p4 ?o4NotBlank .
               ?o4NotBlank ?p5 ?o5NotBlank .
               ?oNotBlank mu:uuid ?finalUuid .
-              ?o2NotBlank mu:uuid ?uuidGeneratedO2 .
+              ?o2NotBlank mu:uuid ?finalUuidO2 .
               ?oNotBlank westtoer:identifier ?notationString .
               ?o2NotBlank schema:opens ?fixedOpens .
               ?o2NotBlank schema:closes ?fixedCloses .
@@ -74,8 +75,22 @@ orchestrator:
               OPTIONAL {
                 ?o rdf:type logies:Faciliteit .
                 ?o logies:isSpecialisatieVan ?faciliteitUrl .
-                BIND(REPLACE(STR(?faciliteitUrl), 'https://data.westtoer.be/id/concepts/', '') AS ?faciliteitId)
-                BIND(CONCAT('uuid-',STR(?faciliteitId)) AS ?uuidStatic)
+                ?o schema:name ?faciliteitName .                
+                OPTIONAL {
+                  ?o westtoer:isDeleted ?faciliteitIsDeleted .
+                }
+
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?faciliteitUrl), ''),
+                      COALESCE(STR(?faciliteitName), ''),
+                      COALESCE(STR(?faciliteitIsDeleted), '')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )
               }
 
               OPTIONAL {
@@ -229,6 +244,33 @@ orchestrator:
                 )
               }
 
+              OPTIONAL{
+                ?o rdf:type schema:Rating.
+                ?o schema:author ?ratingAuthor .
+                ?o schema:ratingValue ?ratingValue .
+                ?o schema:description ?ratingDescription .
+                OPTIONAL{
+                  ?o schema:bestRating ?ratingBest .
+                }
+                OPTIONAL{
+                  ?o schema:worstRating ?ratingWorst .
+                }
+                
+                BIND(
+                  CONCAT(
+                    'uuid-',
+                    MD5(CONCAT(
+                      COALESCE(STR(?ratingAuthor), ''),
+                      COALESCE(STR(?ratingValue), ''),
+                      COALESCE(STR(?ratingDescription), ''),
+                      COALESCE(STR(?ratingBest), ''),
+                      COALESCE(STR(?ratingWorst), '')
+                    ))
+                  )
+                  AS ?uuidStatic
+                )
+              }
+
               OPTIONAL {
                 ?o rdf:type ?typeO .
                 BIND(STRUUID() AS ?uuidGenerated)
@@ -253,9 +295,45 @@ orchestrator:
                 }
 
                 OPTIONAL {
+                  ?o2 rdf:type schema:OpeningHoursSpecification .
+                  OPTIONAL{
+                  ?o2 schema:dayOfWeek ?dayOfWeek .
+                  }
+                  OPTIONAL{
+                  ?o2 schema:opens ?opens .
+                  }
+                  OPTIONAL{
+                  ?o2 schema:closes ?closes .
+                  }
+                  OPTIONAL{
+                  ?o2 schema:validFrom ?validFrom .
+                  }
+                  OPTIONAL{
+                  ?o2 schema:validThrough ?validThrough .
+                  }
+                  
+                  BIND(
+                    CONCAT(
+                      'hours-',
+                      MD5(CONCAT(
+                        COALESCE(STR(?dayOfWeek), ''),
+                        COALESCE(STR(?opens), ''),
+                        COALESCE(STR(?closes), ''),
+                        COALESCE(STR(?validFrom), ''),
+                        COALESCE(STR(?validThrough), '')
+                      ))
+                    )
+                    AS ?uuidStaticO2
+                  )
+    
+                }
+
+                OPTIONAL {
                     ?o2 rdf:type ?typeO2 .
                     BIND(STRUUID() AS ?uuidGeneratedO2)
                 }
+
+                BIND(COALESCE(?uuidStaticO2, ?uuidGeneratedO2) AS ?finalUuidO2)
 
                 
 
