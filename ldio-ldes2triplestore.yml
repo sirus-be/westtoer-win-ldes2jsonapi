@@ -101,7 +101,7 @@ orchestrator:
                 ?o terms:type ?kwaltype .
 
                 BIND(
-                  CONCAT('uuid-', MD5(CONCAT(STR(?kwalLabel), STR(?kwalauthor), STR(?kwalissued), STR(?kwaltype))))
+                  MD5(CONCAT(STR(?kwalLabel), STR(?kwalauthor), STR(?kwalissued), STR(?kwaltype)))
                   AS ?uuidStatic
                 )
               }
@@ -113,7 +113,7 @@ orchestrator:
        
 
                 BIND(
-                  CONCAT('uuid-', MD5(CONCAT(STR(?geoLat), STR(?geoLong))))
+                  MD5(CONCAT(STR(?geoLat), STR(?geoLong)))
                   AS ?uuidStatic
                 )
               }
@@ -129,13 +129,11 @@ orchestrator:
                 }
        
                 BIND(
-                  CONCAT(
-                    'uuid-',
-                    MD5(CONCAT(
+                  MD5(CONCAT(
                       COALESCE(STR(?qvUnitText), ''),
                       COALESCE(STR(?qvValue), ''),
                       COALESCE(STR(?qvCode), '')
-                    ))
+                    )
                   )
                   AS ?uuidStatic
                 )
@@ -150,12 +148,11 @@ orchestrator:
                 }
   
                 BIND(
-                  CONCAT(
-                    'uuid-',
-                    MD5(CONCAT(
+                  
+                  MD5(CONCAT(
                       COALESCE(STR(?MonCur), ''),
                       COALESCE(STR(?MonVal), '')
-                    ))
+                    )
                   )
                   AS ?uuidStatic
                 )
@@ -175,13 +172,12 @@ orchestrator:
                 }
   
                 BIND(
-                  CONCAT(
-                    'uuid-',
+                  
                     MD5(CONCAT(
                       COALESCE(STR(?contactPage), 'ContactPoint'),
                       COALESCE(STR(?contactEmail), ''),
                       COALESCE(STR(?contactTelephone), '')
-                    ))
+                    )
                   )
                   AS ?uuidStatic
                 )
@@ -195,12 +191,11 @@ orchestrator:
                 
 
                 BIND(
-                  CONCAT(
-                    'uuid-',
+                  
                     MD5(CONCAT(
                       COALESCE(STR(?regNotation), 'Registratie'),
                       COALESCE(STR(?regAssoc),'')
-                    ))
+                    )
                   )
                   AS ?uuidStatic
                 )              
@@ -225,8 +220,7 @@ orchestrator:
                 }
                 
                 BIND(
-                  CONCAT(
-                    'uuid-',
+                  
                     MD5(CONCAT(
                       COALESCE(STR(?adresregel1), 'Address'),
                       COALESCE(STR(?postcode), ''),
@@ -234,7 +228,7 @@ orchestrator:
                       COALESCE(STR(?deelgemeente), ''),
                       COALESCE(STR(?gemeente), ''),
                       COALESCE(STR(?provincie), '')
-                    ))
+                    )
                   )
                   AS ?uuidStatic
                 )
@@ -253,15 +247,14 @@ orchestrator:
                 }
                 
                 BIND(
-                  CONCAT(
-                    'uuid-',
+                  
                     MD5(CONCAT(
                       COALESCE(STR(?ratingAuthor), ''),
                       COALESCE(STR(?ratingValue), ''),
                       COALESCE(STR(?ratingDescription), ''),
                       COALESCE(STR(?ratingBest), ''),
                       COALESCE(STR(?ratingWorst), '')
-                    ))
+                    )
                   )
                   AS ?uuidStatic
                 )
@@ -296,8 +289,7 @@ orchestrator:
                 }
 
                 BIND(
-                  CONCAT(
-                    'uuid-',
+                  
                     MD5(CONCAT(
                       COALESCE(STR(?aantalSubzalen), ''),
                       COALESCE(STR(?floorSizeUnitCode), ''),
@@ -306,7 +298,7 @@ orchestrator:
                       COALESCE(STR(?heightUnitCode), ''),
                       COALESCE(STR(?heightUnitText), ''),
                       COALESCE(STR(?heightValue), '')
-                    ))
+                    )
                   )
                   AS ?uuidStatic
                 )
@@ -369,15 +361,14 @@ orchestrator:
                   }
                   
                   BIND(
-                    CONCAT(
-                      'uuid-',
+                    
                       MD5(CONCAT(
                         COALESCE(STR(?dayOfWeek), ''),
                         COALESCE(STR(?opens), ''),
                         COALESCE(STR(?closes), ''),
                         COALESCE(STR(?validFrom), ''),
                         COALESCE(STR(?validThrough), '')
-                      ))
+                      )
                     )
                     AS ?uuidStaticO2
                   )   
@@ -402,14 +393,13 @@ orchestrator:
                     }
                   
                     BIND(
-                      CONCAT(
-                        'uuid-',
+                      
                         MD5(CONCAT(
                           COALESCE(STR(?layoutIndelingBeschikbaar), ''),
                           COALESCE(STR(?layoutCapaciteitText), ''),
                           COALESCE(STR(?layoutCapaciteitCode), ''),
                           COALESCE(STR(?layoutCapaciteitValue), '')
-                        ))
+                        )
                       )
                       AS ?uuidStaticO2
                     )
@@ -429,13 +419,12 @@ orchestrator:
                   }
     
                   BIND(
-                    CONCAT(
-                      'uuid-',
+                    
                       MD5(CONCAT(
                         COALESCE(STR(?contactPageO2), 'ContactPoint'),
                         COALESCE(STR(?contactEmailO2), ''),
                         COALESCE(STR(?contactTelephoneO2), '')
-                      ))
+                      )
                     )
                     AS ?uuidStaticO2
                   )
