@@ -55,3 +55,4 @@
 (add-prefix "adres" "https://data.vlaanderen.be/ns/adres#")
 (add-prefix "foaf" "http://xmlns.com/foaf/0.1/")
 (add-prefix "datatourisme" "https://www.datatourisme.fr/ontology/core#")
+(add-prefix "xsd-secure" "https://www.w3.org/2001/XMLSchema#")
