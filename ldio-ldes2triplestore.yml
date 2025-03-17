@@ -1,7 +1,21 @@
 orchestrator:
   pipelines:
+    - name: wellknown_deletion
+      description: "This pipeline deletes dangling wellknown URIs. The touristattractions pipeline only deletes zero level deep."
+      input:
+        name: Ldio:HttpInPoller
+        config:
+          url: http://database:8890/sparql/?default-graph-uri=http%3A%2F%2Fmu.semte.ch%2Fapplication&query=DELETE%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3FsWellknown%20%3FpWellknown%20%3FoWellknown%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3FsWellknown%20%3FpWellknown%20%3FoWellknown%20.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20FILTER%20%28contains%28str%28%3FsWellknown%29%2C%20%22.well-known%2Fgenid%2F%22%29%29%0AFILTER%20NOT%20EXISTS%20%7B%0A%3Fs%20%3Fp%20%3FsWellknown%20.%0A%7D%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0ALIMIT%201000
+          cron: "0 */30 * * * *" # Every 30min 5000 dangling triples deleted
+          continueOnFail: false
+          retries:
+            enabled: false
+        adapter:
+          name: Ldio:RdfAdapter
+      outputs:
+        - name: Ldio:ConsoleOut
     - name: touristattractions
-      description: "This pipeline will take members from IMJV, and send to an LDES server"
+      description: "This pipeline will take members from Westtoer LDES, and send to Virtuoso"
       input:
         name: Ldio:LdesClient
         config:
@@ -10,10 +24,9 @@ orchestrator:
           sourceFormat: text/turtle
           keep-state: true
           state: sqlite
-          sqlite:
-            directory: touristattractions
           materialisation:
             enabled: true
+            enable-latest-state: true
           retries:
             enabled: true
             max: 10
@@ -22,7 +35,6 @@ orchestrator:
         - name: "Ldio:SparqlConstructTransformer"
           config:
             query: "
-            
             PREFIX dcmitype: <http://purl.org/dc/dcmitype/>
             PREFIX schema: <https://schema.org/>
             PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
@@ -479,7 +491,6 @@ orchestrator:
               BIND(if(isBlank(?o3) && !isLiteral(?o3), URI(concat(?skolemBase, md5(concat(str(?product), str(?o3))))), ?o3) as ?o3NotBlank)
               BIND(if(isBlank(?o4) && !isLiteral(?o4), URI(concat(?skolemBase, md5(concat(str(?product), str(?o4))))), ?o4) as ?o4NotBlank)
               BIND(IF(ISBLANK(?o5) && !ISLITERAL(?o5), URI(CONCAT(?skolemBase, MD5(CONCAT(STR(?product), STR(?o5))))), ?o5) AS ?o5NotBlank)
-
             }
             "
         - name: "Ldio:SparqlConstructTransformer"
@@ -511,13 +522,22 @@ orchestrator:
         #   config:
         #     rdf-writer:
         #       content-type: application/n-quads
-        - name: Ldio:RepositorySink
+        - name: Ldio:HttpSparqlOut
           config:
-            sparql-host: http://rdf4j-server:8080/rdf4j-server
+            endpoint: http://database:8890/sparql
             repository-id: virtuoso
-            named-graph: http://mu.semte.ch/application
-            batch-size: 1
-
+            graph: http://mu.semte.ch/application
+            replacement:
+              enabled: true
+              depth: 0
+            retries:
+              enabled: true
+              max: 10
+              statuses-to-retry: 400, 403, 404
+            rate-limit:
+              enabled: true
+              limit: 60
+              period: PT1M
     - name: taxonomies
       description: "This pipeline will fetch the product types and tree taxonomies."
       input:
@@ -586,14 +606,22 @@ orchestrator:
             "
       outputs:
         # - name: Ldio:ConsoleOut
-        - name: Ldio:RepositorySink
+        - name: Ldio:HttpSparqlOut
           config:
-            sparql-host: http://rdf4j-server:8080/rdf4j-server
+            endpoint: http://database:8890/sparql
             repository-id: virtuoso
-            named-graph: http://mu.semte.ch/application
-            batch-timeout: 10000
-            batch-size: 10
-
+            graph: http://mu.semte.ch/application
+            replacement:
+              enabled: true
+              depth: 1
+            retries:
+              enabled: true
+              max: 10
+              statuses-to-retry: 400, 403, 404
+            rate-limit:
+              enabled: true
+              limit: 60
+              period: PT1M
     - name: producttypes
       description: "This pipeline will fetch the product types."
       input:
@@ -640,14 +668,22 @@ orchestrator:
             "
       outputs:
         # - name: Ldio:ConsoleOut
-        - name: Ldio:RepositorySink
+        - name: Ldio:HttpSparqlOut
           config:
-            sparql-host: http://rdf4j-server:8080/rdf4j-server
+            endpoint: http://database:8890/sparql
             repository-id: virtuoso
-            named-graph: http://mu.semte.ch/application
-            batch-timeout: 10000
-            batch-size: 10
-
+            graph: http://mu.semte.ch/application
+            replacement:
+              enabled: true
+              depth: 1
+            retries:
+              enabled: true
+              max: 10
+              statuses-to-retry: 400, 403, 404
+            rate-limit:
+              enabled: true
+              limit: 60
+              period: PT1M
     - name: municipalities
       description: "This pipeline will fetch the municipalities."
       input:
@@ -700,14 +736,22 @@ orchestrator:
             "
       outputs:
         # - name: Ldio:ConsoleOut
-        - name: Ldio:RepositorySink
+        - name: Ldio:HttpSparqlOut
           config:
-            sparql-host: http://rdf4j-server:8080/rdf4j-server
+            endpoint: http://database:8890/sparql
             repository-id: virtuoso
-            named-graph: http://mu.semte.ch/application
-            batch-timeout: 10000
-            batch-size: 1
-
+            graph: http://mu.semte.ch/application
+            replacement:
+              enabled: true
+              depth: 1
+            retries:
+              enabled: true
+              max: 10
+              statuses-to-retry: 400, 403, 404
+            rate-limit:
+              enabled: true
+              limit: 60
+              period: PT1M
     - name: touristregions
       description: "This pipeline will fetch the tourist-regions."
       input:
@@ -743,10 +787,19 @@ orchestrator:
             "
       outputs:
         # - name: Ldio:ConsoleOut
-        - name: Ldio:RepositorySink
+        - name: Ldio:HttpSparqlOut
           config:
-            sparql-host: http://rdf4j-server:8080/rdf4j-server
+            endpoint: http://database:8890/sparql
             repository-id: virtuoso
-            named-graph: http://mu.semte.ch/application
-            batch-timeout: 10000
-            batch-size: 10
+            graph: http://mu.semte.ch/application
+            replacement:
+              enabled: true
+              depth: 1
+            retries:
+              enabled: true
+              max: 10
+              statuses-to-retry: 400, 403, 404
+            rate-limit:
+              enabled: true
+              limit: 60
+              period: PT1M
