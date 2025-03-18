@@ -536,7 +536,7 @@ orchestrator:
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 60
+              limit: 30000
               period: PT1M
     - name: taxonomies
       description: "This pipeline will fetch the product types and tree taxonomies."
@@ -620,7 +620,7 @@ orchestrator:
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 60
+              limit: 30000
               period: PT1M
     - name: producttypes
       description: "This pipeline will fetch the product types."
@@ -682,7 +682,7 @@ orchestrator:
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 60
+              limit: 30000
               period: PT1M
     - name: municipalities
       description: "This pipeline will fetch the municipalities."
@@ -750,7 +750,7 @@ orchestrator:
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 60
+              limit: 30000
               period: PT1M
     - name: touristregions
       description: "This pipeline will fetch the tourist-regions."
@@ -801,5 +801,5 @@ orchestrator:
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 60
+              limit: 30000
               period: PT1M
