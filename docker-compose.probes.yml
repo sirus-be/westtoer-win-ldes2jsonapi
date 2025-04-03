@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: ContainerApp
+metadata:
+  name: multi-container-app
+spec:
+  configuration:
+    # Only one container gets public traffic.
+    ingress:
+      external: true
+      targetPort: 80
+  template:
+    containers:
+      - name: proxy
+        image: svercoutere/sirus-westtoer-proxy:0.0.2
+        env:
+          - name: TARGET_API_URL
+            value: "http://resource"
+          - name: SPARQL_API_URL
+            value: "http://database:8890"
+        probes:
+          - type: liveness
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          - type: readiness
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+      - name: resource
+        image: svercoutere/sirus-mu-resources:0.0.3
+        env:
+          - name: CACHE_CLEAR_PATH
+            value: "http://cache/.mu/clear-keys"
+          - name: SPARQL_API_URL
+            value: "http://database:8890"
+        probes:
+          - type: liveness
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          - type: readiness
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+      - name: ldio-workbench
+        image: ldes/ldi-orchestrator:2.9.0-SNAPSHOT
+        probes:
+          - type: liveness
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          - type: readiness
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+      - name: database
+        image: tenforce/virtuoso:1.3.2-virtuoso7.2.5.1
+        env:
+          - name: SPARQL_UPDATE
+            value: "true"
+          - name: DEFAULT_GRAPH
+            value: "http://mu.semte.ch/application"
+        probes:
+          - type: liveness
+            httpGet:
+              path: /sparql
+              port: 8890
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          - type: readiness
+            httpGet:
+              path: /sparql
+              port: 8890
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+      - name: rdf4j-server
+        image: eclipse/rdf4j-workbench:latest
+        env:
+          - name: JAVA_OPTS
+            value: "-Xms1g -Xmx4g"
+        probes:
+          - type: liveness
+            httpGet:
+              path: /rdf4j-server/repositories
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          - type: readiness
+            httpGet:
+              path: /rdf4j-server/repositories
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 3
+
+      - name: curl-create-rdf4j-repository
+        image: alpine/curl
+        command:
+          - sh
+          - -c
+          - |
+            curl -X PUT 'http://rdf4j-server:8080/rdf4j-server/repositories/virtuoso' \
+              --header 'Content-Type: text/turtle' \
+              --data-raw '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+            @prefix rep: <http://www.openrdf.org/config/repository#>.
+            @prefix sparql: <http://www.openrdf.org/config/sparql#>.
+            @prefix config: <tag:rdf4j.org,2023:config/>.
+            [] a config:Repository ;
+              config:rep.id "virtuoso" ;
+              rdfs:label "SPARQL endpoint virtuoso" ;
+              config:rep.impl [
+                  config:rep.type "openrdf:SPARQLRepository";
+                  config:sparql.queryEndpoint <http://database:8890/sparql>;
+                  config:sparql.updateEndpoint <http://database:8890/sparql>
+              ].'
+        # This container is a one-off job; probes are not necessary.
