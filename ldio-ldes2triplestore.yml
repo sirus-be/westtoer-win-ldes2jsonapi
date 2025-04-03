@@ -57,6 +57,7 @@ orchestrator:
             CONSTRUCT {
               ?product ?p ?oNotBlank .
               ?product mu:uuid ?uuidNoDatatype .
+              ?product westtoer:verwerktVoorAfnemers ?generatedTimestamp .
               ?oNotBlank a ?finalType .
               ?oNotBlank ?p2 ?o2NotBlank .
               ?o2NotBlank ?p3 ?o3NotBlank .
@@ -78,6 +79,9 @@ orchestrator:
               }
 
               ?product ?p ?o .
+              
+              BIND(now() AS ?generatedTimestamp)
+              
 
               OPTIONAL {
                 ?o generiek:lokaleIdentificator ?uuidMediaRaw .

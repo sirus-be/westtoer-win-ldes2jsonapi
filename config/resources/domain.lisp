@@ -41,6 +41,7 @@
   :properties `((:naam :language-string-set ,(s-prefix "schema:name"))
                 (:omschrijving :language-string-set ,(s-prefix "schema:description"))
                 (:generated-at-time :datetime ,(s-prefix "prov:generatedAtTime"))
+                (:verwerkt-voor-afnemers :datetime ,(s-prefix "westtoer:verwerktVoorAfnemers"))
                 (:lokale-identificator :rdfs-string ,(s-prefix "generiek:lokaleIdentificator"))
                 (:naamruimte :rdfs-string ,(s-prefix "generiek:naamruimte"))
                 (:versie-identificator :string ,(s-prefix "generiek:versieIdentificator"))
