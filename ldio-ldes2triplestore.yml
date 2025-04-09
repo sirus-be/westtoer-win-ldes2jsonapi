@@ -540,7 +540,7 @@ orchestrator:
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 30000
+              limit: 10000
               period: PT1M
     - name: taxonomies
       description: "This pipeline will fetch the product types and tree taxonomies."
@@ -617,14 +617,14 @@ orchestrator:
             graph: http://mu.semte.ch/application
             replacement:
               enabled: true
-              depth: 1
+              depth: 0
             retries:
               enabled: true
               max: 10
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 30000
+              limit: 10000
               period: PT1M
     - name: producttypes
       description: "This pipeline will fetch the product types."
@@ -679,14 +679,14 @@ orchestrator:
             graph: http://mu.semte.ch/application
             replacement:
               enabled: true
-              depth: 1
+              depth: 0
             retries:
               enabled: true
               max: 10
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 30000
+              limit: 10000
               period: PT1M
     - name: municipalities
       description: "This pipeline will fetch the municipalities."
@@ -747,14 +747,14 @@ orchestrator:
             graph: http://mu.semte.ch/application
             replacement:
               enabled: true
-              depth: 1
+              depth: 0
             retries:
               enabled: true
               max: 10
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 30000
+              limit: 10000
               period: PT1M
     - name: touristregions
       description: "This pipeline will fetch the tourist-regions."
@@ -798,12 +798,12 @@ orchestrator:
             graph: http://mu.semte.ch/application
             replacement:
               enabled: true
-              depth: 1
+              depth: 0
             retries:
               enabled: true
               max: 10
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
-              limit: 30000
+              limit: 10000
               period: PT1M
