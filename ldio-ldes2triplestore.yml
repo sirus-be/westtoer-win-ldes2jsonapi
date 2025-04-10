@@ -29,7 +29,7 @@ orchestrator:
             enable-latest-state: true
           retries:
             enabled: true
-            max: 10
+            max: 15
             statuses-to-retry: 403, 404
       transformers:
         - name: "Ldio:SparqlConstructTransformer"
@@ -335,9 +335,10 @@ orchestrator:
                 OPTIONAL {
                   ?o schema:url ?resourceUrl .
                 }
-                ?o schema:additionalType ?resourceAddType .
-                BIND(STRAFTER(STR(?resourceAddType), 'https://data.westtoer.be/id/concepts/') AS ?resourceAddTypeId)
 
+                ?o schema:additionalType ?resourceAddType .
+                BIND(REPLACE(STR(?resourceAddType), '.*/', '') AS ?resourceAddTypeId)
+ 
                 BIND(
                     CONCAT(
                     COALESCE(STR(?resourceAddTypeId), ''),
@@ -347,7 +348,7 @@ orchestrator:
                   AS ?uuidStatic
                 )
                 
-              }
+              }       
               
               BIND(COALESCE(?uuidStatic, ?uuidGenerated) AS ?finalUuid)
               BIND(COALESCE(?typeO, ?typeSeeAlso) AS ?finalType)
@@ -536,7 +537,7 @@ orchestrator:
               depth: 0
             retries:
               enabled: true
-              max: 10
+              max: 15
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
@@ -620,7 +621,7 @@ orchestrator:
               depth: 0
             retries:
               enabled: true
-              max: 10
+              max: 15
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
@@ -665,9 +666,7 @@ orchestrator:
               }  
               WHERE {  
                 ?object ?p ?o .  
-                FILTER NOT EXISTS { ?object mu:uuid ?existingUuid }  
-                BIND(CONCAT('uuid-', SHA256(STR(?object))) AS ?uuid)  
- 
+                BIND(REPLACE(STR(?object), '.*/', '') AS ?uuid)
               }
             "
       outputs:
@@ -682,7 +681,7 @@ orchestrator:
               depth: 0
             retries:
               enabled: true
-              max: 10
+              max: 15
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
@@ -750,7 +749,7 @@ orchestrator:
               depth: 0
             retries:
               enabled: true
-              max: 10
+              max: 15
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true
@@ -801,7 +800,7 @@ orchestrator:
               depth: 0
             retries:
               enabled: true
-              max: 10
+              max: 15
               statuses-to-retry: 400, 403, 404
             rate-limit:
               enabled: true

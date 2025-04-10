@@ -32,7 +32,7 @@ Currently, the following resource types and endpoints are defined:
 ## Basic harvesting
 
 This section explains how you can retrieve all data per city through pagination, and how you can stay up to date.
-The API has following base URL: https://ca-proxy-westtoer-data.calmmushroom-8db04b5f.westeurope.azurecontainerapps.io
+The API has following base URL: https://ca-westtoerwinapi-nginx-prod.kindsmoke-b1181e5c.westeurope.azurecontainerapps.io
 
 ### Replication
 
@@ -49,13 +49,13 @@ Repeat this process until there is no "Next" link available.
 ### Synchronization
 
 Once you have copied all the data in previous step, you can now only fetch the latest changed products.
-This can be done by adding a filter parameter on generated-at-time.
+This can be done by adding a filter parameter on verwerkt-voor-afnemers.
 
-For example, to retrieve all updates greater than or equal to 2024-10-06: `filter[:gte:generated-at-time]=2024-10-06`
+For example, to retrieve all updates greater than or equal to 2024-10-06: `filter[:gte:verwerkt-voor-afnemers]=2024-10-06`
 
-    GET /attracties?filter[:gte:generated-at-time]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordelingen,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook,zie-ook.extratype
+    GET /attracties?filter[:gte:verwerkt-voor-afnemers]=2024-10-06&filter[adres][nis-code]=31005&include=identificator,adres,adres.toegekend-door-deelgemeente,adres.toegekend-door-gemeente,adres.toegekend-door-provincie,geometrie,contactpunt,contactpunt.openingsuren,beoordelingen,tourismeRegio,registratie,prijs,capaciteit,productstatus,extratype,behoort-tot-macroproduct,media,kwaliteitslabels,faciliteiten,kenmerken,ruimtes,ruimtes.hoogte,ruimtes.indelingen,ruimtes.oppervlakte,zie-ook,zie-ook.extratype
 
-You can also filter on a timestamp: `filter[:gte:generated-at-time]=2024-10-10T11:50:27Z`
+You can also filter on a timestamp: `filter[:gte:verwerkt-voor-afnemers]=2024-10-10T11:50:27Z`
 
 ## Basic filtering
 
@@ -103,7 +103,7 @@ Let's sort our attracties by their name
 
 Let's sort by publishing date, descending and then by name
 
-    GET /attracties?sort=-generated-at-time,naam
+    GET /attracties?sort=-verwerkt-voor-afnemers,naam
 
 Sorting by relationships allows us to sort attracties by the adres
 
@@ -128,7 +128,7 @@ Aside from regular text searches, a set of custom filters have been added.  Thes
 
 - *:gt:* Ensures the property has a larger value than the supplied value
 
-    GET /attracties?filter[:gt:generated-at-time]=2024-10-10
+    GET /attracties?filter[:gt:verwerkt-voor-afnemers]=2024-10-10
 
 - *:gte:* Ensures the property has a value larger than or equal to the supplied value
 - *:lt:* Ensures the property has a smaller value than then supplied value
