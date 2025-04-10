@@ -26,7 +26,7 @@ services:
     logging: *default-logging
     labels:
       - "logging=true"
-    image: svercoutere/sirus-mu-resources:0.0.3
+    image: svercoutere/sirus-mu-resources:0.0.2
     volumes:
       - ./config/resources:/config
     restart: always

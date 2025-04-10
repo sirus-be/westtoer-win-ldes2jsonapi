@@ -336,19 +336,19 @@ orchestrator:
                   ?o schema:url ?resourceUrl .
                 }
                 ?o schema:additionalType ?resourceAddType .
+                BIND(STRAFTER(STR(?resourceAddType), 'https://data.westtoer.be/id/concepts/') AS ?resourceAddTypeId)
 
                 BIND(
-                  CONCAT(
-                    'uuid-',
-                    MD5(CONCAT(
-                      COALESCE(STR(?resourceUrl), ''),
-                      COALESCE(STR(?resourceAddType), '')
-                    ))
-                  )
+                    CONCAT(
+                    COALESCE(STR(?resourceAddTypeId), ''),
+                      '/',
+                      md5(COALESCE(STR(?resourceUrl), ''))
+                    )
                   AS ?uuidStatic
-                )      
+                )
+                
               }
-
+              
               BIND(COALESCE(?uuidStatic, ?uuidGenerated) AS ?finalUuid)
               BIND(COALESCE(?typeO, ?typeSeeAlso) AS ?finalType)
 
@@ -489,13 +489,13 @@ orchestrator:
               }
 
 
-              BIND('https://data.westtoer.be/id/.well-known/genid/' as ?skolemBase)
-              BIND(if(isBlank(?o) && !isLiteral(?o), URI(concat(?skolemBase, md5(concat(str(?product), str(?o))))), ?o) as ?oNotBlank)
-              BIND(if(isBlank(?o2) && !isLiteral(?o2), URI(concat(?skolemBase, md5(concat(str(?product), str(?o2))))), ?o2) as ?o2NotBlank)
-              BIND(if(isBlank(?o3) && !isLiteral(?o3), URI(concat(?skolemBase, md5(concat(str(?product), str(?o3))))), ?o3) as ?o3NotBlank)
-              BIND(if(isBlank(?o4) && !isLiteral(?o4), URI(concat(?skolemBase, md5(concat(str(?product), str(?o4))))), ?o4) as ?o4NotBlank)
+              BIND('https://data.westtoer.be/id/.well-known/genid/' AS ?skolemBase)
+              BIND(if(isBlank(?o) && !isLiteral(?o), URI(concat(?skolemBase, ?finalUuid)), ?o) AS ?oNotBlank)
+              BIND(if(isBlank(?o2) && !isLiteral(?o2), URI(concat(?skolemBase, ?finalUuidO2)), ?o2) AS ?o2NotBlank)
+              BIND(if(isBlank(?o3) && !isLiteral(?o3), URI(concat(?skolemBase, md5(concat(str(?product), str(?o3))))), ?o3) AS ?o3NotBlank)
+              BIND(if(isBlank(?o4) && !isLiteral(?o4), URI(concat(?skolemBase, md5(concat(str(?product), str(?o4))))), ?o4) AS ?o4NotBlank)
               BIND(IF(ISBLANK(?o5) && !ISLITERAL(?o5), URI(CONCAT(?skolemBase, MD5(CONCAT(STR(?product), STR(?o5))))), ?o5) AS ?o5NotBlank)
-            }
+              }
             "
         - name: "Ldio:SparqlConstructTransformer"
           config:
