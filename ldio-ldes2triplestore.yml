@@ -225,13 +225,7 @@ orchestrator:
                       COALESCE(STR(?contactPage), 'ContactPoint'),
                       COALESCE(STR(?contactEmail), ''),
                       COALESCE(STR(?contactTelephone), ''),
-                      CONCAT(
-                        COALESCE(STR(?dayOfWeek), ''),
-                        COALESCE(STR(?opens), ''),
-                        COALESCE(STR(?closes), ''),
-                        COALESCE(STR(?validFrom), ''),
-                        COALESCE(STR(?validThrough), '')
-                      )
+                      COALESCE(STR(?wincode), '')
                     )
                   )
                   AS ?uuidStatic
