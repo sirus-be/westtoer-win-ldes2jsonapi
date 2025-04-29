@@ -186,6 +186,38 @@ orchestrator:
                 OPTIONAL {
                   ?o schema:telephone ?contactTelephone .
                 }
+                OPTIONAL {
+                  ?o ?p2 ?o2 .
+                  ?o2 rdf:type schema:OpeningHoursSpecification .
+                  OPTIONAL{
+                  ?o2 schema:dayOfWeek ?dayOfWeek .
+                  }
+                  OPTIONAL{
+                  ?o2 schema:opens ?opens .
+                  }
+                  OPTIONAL{
+                  ?o2 schema:closes ?closes .
+                  }
+                  OPTIONAL{
+                  ?o2 schema:validFrom ?validFrom .
+                  }
+                  OPTIONAL{
+                  ?o2 schema:validThrough ?validThrough .
+                  }
+                  
+                  BIND(
+                    
+                      MD5(CONCAT(
+                        COALESCE(STR(?dayOfWeek), ''),
+                        COALESCE(STR(?opens), ''),
+                        COALESCE(STR(?closes), ''),
+                        COALESCE(STR(?validFrom), ''),
+                        COALESCE(STR(?validThrough), '')
+                      )
+                    )
+                    AS ?uuidStaticO2
+                  )   
+                }
   
                 BIND(
                   
@@ -358,38 +390,6 @@ orchestrator:
                 ?o ?p2 ?o2 .
                 FILTER NOT EXISTS {
                   ?o rdf:type logies:ToeristischeRegio .
-                }
-
-                OPTIONAL {
-                  ?o2 rdf:type schema:OpeningHoursSpecification .
-                  OPTIONAL{
-                  ?o2 schema:dayOfWeek ?dayOfWeek .
-                  }
-                  OPTIONAL{
-                  ?o2 schema:opens ?opens .
-                  }
-                  OPTIONAL{
-                  ?o2 schema:closes ?closes .
-                  }
-                  OPTIONAL{
-                  ?o2 schema:validFrom ?validFrom .
-                  }
-                  OPTIONAL{
-                  ?o2 schema:validThrough ?validThrough .
-                  }
-                  
-                  BIND(
-                    
-                      MD5(CONCAT(
-                        COALESCE(STR(?dayOfWeek), ''),
-                        COALESCE(STR(?opens), ''),
-                        COALESCE(STR(?closes), ''),
-                        COALESCE(STR(?validFrom), ''),
-                        COALESCE(STR(?validThrough), '')
-                      )
-                    )
-                    AS ?uuidStaticO2
-                  )   
                 }
 
                 OPTIONAL {
