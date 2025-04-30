@@ -175,25 +175,20 @@ orchestrator:
               }
 
               OPTIONAL {
-                ?o rdf:type schema:ContactPoint.
+                ?o rdf:type schema:ContactPoint .
+                ?parent schema:contactPoint ?o .
 
-                OPTIONAL {
-                  ?o foaf:page ?contactPage .
-                }
-                OPTIONAL {
-                  ?o schema:email ?contactEmail .
-                }
-                OPTIONAL {
-                  ?o schema:telephone ?contactTelephone .
-                }
-  
+                OPTIONAL { ?o foaf:page      ?contactPage    }
+                OPTIONAL { ?o schema:email   ?contactEmail   }
+                OPTIONAL { ?o schema:telephone ?contactTelephone }
+
                 BIND(
-                  
-                    MD5(CONCAT(
-                      COALESCE(STR(?contactPage), 'ContactPoint'),
+                MD5(
+                    CONCAT(
+                      COALESCE(STR(?contactPage),'ContactPoint-o1'),
                       COALESCE(STR(?contactEmail), ''),
-                      COALESCE(STR(?contactTelephone), ''),
-                      COALESCE(STR(?wincode), '')
+                      COALESCE(STR(?contactTelephone),''),
+                      COALESCE(STR(?parent),'empty-product-o1')
                     )
                   )
                   AS ?uuidStatic
@@ -439,9 +434,11 @@ orchestrator:
                   BIND(
                     
                       MD5(CONCAT(
-                        COALESCE(STR(?contactPageO2), 'ContactPoint'),
+                        STR('ContactPoint-o2'),
+                        COALESCE(STR(?contactPageO2), 'ContactPoint-o2'),
                         COALESCE(STR(?contactEmailO2), ''),
-                        COALESCE(STR(?contactTelephoneO2), '')
+                        COALESCE(STR(?contactTelephoneO2), ''),
+                        COALESCE(STR(?product), 'empty-product-o2')
                       )
                     )
                     AS ?uuidStaticO2
