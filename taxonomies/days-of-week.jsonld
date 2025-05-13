@@ -26,12 +26,12 @@
         }
     },
     "@included": [
-        { "id": "1", "label": "maandag", "labelEnglish": "Monday", "labelFrench": "lundi", "labelGerman": "Montag" },
-        { "id": "2", "label": "dinsdag", "labelEnglish": "Tuesday", "labelFrench": "mardi", "labelGerman": "Dienstag" },
-        { "id": "3", "label": "woensdag", "labelEnglish": "Wednesday", "labelFrench": "mercredi", "labelGerman": "Mittwoch" },
-        { "id": "4", "label": "donderdag", "labelEnglish": "Thursday", "labelFrench": "jeudi", "labelGerman": "Donnerstag" },
-        { "id": "5", "label": "vrijdag", "labelEnglish": "Friday", "labelFrench": "vendredi", "labelGerman": "Freitag" },
-        { "id": "6", "label": "zaterdag", "labelEnglish": "Saturday", "labelFrench": "samedi", "labelGerman": "Samstag" },
-        { "id": "7", "label": "zondag", "labelEnglish": "Sunday", "labelFrench": "dimanche", "labelGerman": "Sonntag" }
+        { "id": "Monday", "label": "Maandag", "labelEnglish": "Monday", "labelFrench": "lundi", "labelGerman": "Montag" },
+        { "id": "Tuesday", "label": "Dinsdag", "labelEnglish": "Tuesday", "labelFrench": "mardi", "labelGerman": "Dienstag" },
+        { "id": "Wednesday", "label": "Woensdag", "labelEnglish": "Wednesday", "labelFrench": "mercredi", "labelGerman": "Mittwoch" },
+        { "id": "Thursday", "label": "Donderdag", "labelEnglish": "Thursday", "labelFrench": "jeudi", "labelGerman": "Donnerstag" },
+        { "id": "Friday", "label": "Vrijdag", "labelEnglish": "Friday", "labelFrench": "vendredi", "labelGerman": "Freitag" },
+        { "id": "Saturday", "label": "Zaterdag", "labelEnglish": "Saturday", "labelFrench": "samedi", "labelGerman": "Samstag" },
+        { "id": "Sunday", "label": "Zondag", "labelEnglish": "Sunday", "labelFrench": "dimanche", "labelGerman": "Sonntag" }
     ]
 }
