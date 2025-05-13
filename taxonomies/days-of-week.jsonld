@@ -1,0 +1,37 @@
+{
+    "@context": {
+        "@base": "https://schema.org/",
+        "id": "@id",
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "label": {
+            "@id": "skos:prefLabel",
+            "@language": "nl"
+        },
+        "items": "skos:narrower",
+        "labelDutch": {
+            "@id": "label",
+            "@language": "nl"
+        },
+        "labelEnglish": {
+            "@id": "label",
+            "@language": "en"
+        },
+        "labelFrench": {
+            "@id": "label",
+            "@language": "fr"
+        },
+        "labelGerman": {
+            "@id": "label",
+            "@language": "de"
+        }
+    },
+    "@included": [
+        { "id": "1", "label": "maandag", "labelEnglish": "Monday", "labelFrench": "lundi", "labelGerman": "Montag" },
+        { "id": "2", "label": "dinsdag", "labelEnglish": "Tuesday", "labelFrench": "mardi", "labelGerman": "Dienstag" },
+        { "id": "3", "label": "woensdag", "labelEnglish": "Wednesday", "labelFrench": "mercredi", "labelGerman": "Mittwoch" },
+        { "id": "4", "label": "donderdag", "labelEnglish": "Thursday", "labelFrench": "jeudi", "labelGerman": "Donnerstag" },
+        { "id": "5", "label": "vrijdag", "labelEnglish": "Friday", "labelFrench": "vendredi", "labelGerman": "Freitag" },
+        { "id": "6", "label": "zaterdag", "labelEnglish": "Saturday", "labelFrench": "samedi", "labelGerman": "Samstag" },
+        { "id": "7", "label": "zondag", "labelEnglish": "Sunday", "labelFrench": "dimanche", "labelGerman": "Sonntag" }
+    ]
+}
