@@ -356,10 +356,10 @@ orchestrator:
                 }
 
                 OPTIONAL {
+                  ?product schema:contactPoint/schema:hoursAvailable ?o2 .
                   ?o2 rdf:type schema:OpeningHoursSpecification .
-                  OPTIONAL{
-                  ?o2 schema:dayOfWeek ?dayOfWeek .
-                  }
+
+                 
                   OPTIONAL{
                   ?o2 schema:opens ?opens .
                   }
@@ -370,21 +370,26 @@ orchestrator:
                   ?o2 schema:validFrom ?validFrom .
                   }
                   OPTIONAL{
-                  ?o2 schema:validThrough ?validThrough .
+                  ?o2  schema:validThrough ?validThrough .
                   }
+         
                   
+
                   BIND(
-                    
-                      MD5(CONCAT(
-                        COALESCE(STR(?dayOfWeek), ''),
+                    MD5(
+                      CONCAT(
+                        COALESCE(STR(?product), 'blank-product'),
                         COALESCE(STR(?opens), ''),
                         COALESCE(STR(?closes), ''),
                         COALESCE(STR(?validFrom), ''),
                         COALESCE(STR(?validThrough), '')
                       )
                     )
-                    AS ?uuidStaticO2
-                  )   
+                    
+                    
+                    AS ?uuidStaticO2OpeningHours
+                  )
+                             
                 }
 
                 OPTIONAL {
@@ -414,7 +419,7 @@ orchestrator:
                           COALESCE(STR(?layoutCapaciteitValue), '')
                         )
                       )
-                      AS ?uuidStaticO2
+                      AS ?uuidStaticO2layout
                     )
                 }
 
@@ -441,16 +446,16 @@ orchestrator:
                         COALESCE(STR(?product), 'empty-product-o2')
                       )
                     )
-                    AS ?uuidStaticO2
+                    AS ?uuidStaticO2ContactPoint
                   )
                 }
 
                 OPTIONAL {
                     ?o2 rdf:type ?typeO2 .
-                    BIND(STRUUID() AS ?uuidGeneratedO2)
+                    BIND(CONCAT('random-02-',STRUUID()) AS ?uuidGeneratedO2)
                 }
 
-                BIND(COALESCE(?uuidStaticO2, ?uuidGeneratedO2) AS ?finalUuidO2)
+                BIND(COALESCE(?uuidStaticO2OpeningHours, ?uuidStaticO2layout, ?uuidStaticO2ContactPoint, ?uuidGeneratedO2) AS ?finalUuidO2)
 
                 
 
@@ -467,6 +472,8 @@ orchestrator:
                     BIND(str(?closes) as ?fixedCloses)
 
                   }
+
+
 
                   OPTIONAL {
                     ?o3 ?p4 ?o4 .
@@ -496,6 +503,7 @@ orchestrator:
               BIND(IF(ISBLANK(?o5) && !ISLITERAL(?o5), URI(CONCAT(?skolemBase, MD5(CONCAT(STR(?product), STR(?o5))))), ?o5) AS ?o5NotBlank)
               }
             "
+       
         - name: "Ldio:SparqlConstructTransformer"
           config:
             query: "
@@ -520,6 +528,7 @@ orchestrator:
               }               
             }
             "
+
       outputs:
         # - name: Ldio:ConsoleOut
         #   config:
@@ -783,6 +792,58 @@ orchestrator:
                 ?object ?p ?o .  
                 FILTER NOT EXISTS { ?object mu:uuid ?existingUuid }  
                 BIND(CONCAT('uuid-', SHA256(STR(?object))) AS ?uuid)  
+ 
+              }
+            "
+      outputs:
+        # - name: Ldio:ConsoleOut
+        - name: Ldio:HttpSparqlOut
+          config:
+            endpoint: http://database:8890/sparql
+            repository-id: virtuoso
+            graph: http://mu.semte.ch/application
+            replacement:
+              enabled: true
+              depth: 0
+            retries:
+              enabled: true
+              max: 15
+              statuses-to-retry: 400, 403, 404
+            rate-limit:
+              enabled: true
+              limit: 10000
+              period: PT1M
+    - name: daysofweek
+      description: "This pipeline will fetch the weekdays."
+      input:
+        name: Ldio:HttpInPoller
+        config:
+          url:
+            - https://sirus-be.github.io/westtoer-win-ldes2jsonapi/taxonomies/days-of-week.jsonld
+
+          cron: "*/60 * * * * *"
+        adapter:
+            name: Ldio:RdfAdapter
+      transformers:
+        - name: "Ldio:SparqlConstructTransformer"
+          config:
+            query: "
+              PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  
+              PREFIX mu: <http://mu.semte.ch/vocabularies/core/>  
+              PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  
+ 
+              CONSTRUCT {  
+                graph ?object {
+                  ?object a skos:Concept .  
+                  ?object mu:uuid ?uuid .  
+                  ?object ?p ?o . 
+                }
+              }  
+              WHERE {  
+                ?object ?p ?o .  
+                FILTER NOT EXISTS { ?object mu:uuid ?existingUuid }  
+                BIND(CONCAT('uuid-', SHA256(STR(?object))) AS ?uuid) 
+             
  
               }
             "
