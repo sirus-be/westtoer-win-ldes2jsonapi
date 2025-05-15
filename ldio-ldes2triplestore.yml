@@ -20,7 +20,8 @@ orchestrator:
         name: Ldio:LdesClient
         config:
           urls:
-            - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions
+            # - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions
+            - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions/latestView?pageNumber=544
           sourceFormat: text/turtle
           keep-state: true
           state: sqlite
@@ -68,6 +69,8 @@ orchestrator:
               ?oNotBlank westtoer:identifier ?notationString .
               ?o2NotBlank schema:opens ?fixedOpens .
               ?o2NotBlank schema:closes ?fixedCloses .
+
+              ?product foaf:test ?days .
             }
             WHERE {
               {
@@ -181,13 +184,14 @@ orchestrator:
                 OPTIONAL { ?o foaf:page      ?contactPage    }
                 OPTIONAL { ?o schema:email   ?contactEmail   }
                 OPTIONAL { ?o schema:telephone ?contactTelephone }
-
+                OPTIONAL { ?o schema:hoursAvailable ?contactOpeningsuren }
                 BIND(
                 MD5(
                     CONCAT(
                       COALESCE(STR(?contactPage),'ContactPoint-o1'),
                       COALESCE(STR(?contactEmail), ''),
                       COALESCE(STR(?contactTelephone),''),
+                      COALESCE(STR(?contactOpeningsuren), ''),
                       COALESCE(STR(?parent),'empty-product-o1')
                     )
                   )
@@ -359,7 +363,6 @@ orchestrator:
                   ?product schema:contactPoint/schema:hoursAvailable ?o2 .
                   ?o2 rdf:type schema:OpeningHoursSpecification .
 
-                 
                   OPTIONAL{
                   ?o2 schema:opens ?opens .
                   }
@@ -386,7 +389,6 @@ orchestrator:
                       ORDER BY ASC(?dow)
                     }
                   }
-
 
                   BIND(
                     MD5(
