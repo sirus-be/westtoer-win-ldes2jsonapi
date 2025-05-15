@@ -373,36 +373,32 @@ orchestrator:
                   ?o2  schema:validThrough ?validThrough .
                   }
 
-
-                  {
-                    SELECT ?o2 (GROUP_CONCAT(STR(?dow); SEPARATOR=', ') AS ?days)
-                    WHERE {
-                      {
-                        SELECT ?o2  ?dow
-                        WHERE {
-                          ?o2  rdf:type schema:OpeningHoursSpecification ;
-                            schema:dayOfWeek ?dow .
-                        }
-                        ORDER BY ASC(?dow)
+                  OPTIONAL {
+                    ?o2 schema:dayOfWeek ?dow .
+                    {
+                      SELECT ?product ?o2 (GROUP_CONCAT(STR(?dow); SEPARATOR=', ') AS ?days)
+                      WHERE {
+                        ?product schema:contactPoint/schema:hoursAvailable ?o2 .
+                        ?o2  rdf:type schema:OpeningHoursSpecification ;
+                          schema:dayOfWeek ?dow .
                       }
+                      GROUP BY ?product ?o2
+                      ORDER BY ASC(?dow)
                     }
-                    GROUP BY ?o2 
                   }
 
 
                   BIND(
-                  
+                    MD5(
                       CONCAT(
-
                         COALESCE(STR(?product), 'blank-product'),
                         COALESCE(STR(?opens), ''),
                         COALESCE(STR(?closes), ''),
                         COALESCE(STR(?validFrom), ''),
                         COALESCE(STR(?validThrough), ''),
-                        COALESCE(STR(?days), '')
-                      
-                    )
-                    
+                        COALESCE(MD5(STR(?days)), '')
+                      )
+                    )                   
                     
                     AS ?uuidStaticO2OpeningHours
                   )

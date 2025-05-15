@@ -172,12 +172,9 @@
   :class (s-prefix "schema:OpeningHoursSpecification")
   :properties `((:sluit :string ,(s-prefix "schema:closes"))
                 (:open :string ,(s-prefix "schema:opens"))
+                (:dag :uri-set ,(s-prefix "schema:dayOfWeek"))
                 (:geldig-van :datetime ,(s-prefix "schema:validFrom"))
                 (:geldig-tot :datetime ,(s-prefix "schema:validThrough")))
-
-  :has-many `((preferred-label :via ,(s-prefix "schema:dayOfWeek")
-                           :as "dagen"))
-
   :resource-base (s-url "https://data.westtoer.be/id/opening-hours/")
   :on-path "openingsuren")
 
