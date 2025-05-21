@@ -21,7 +21,7 @@ orchestrator:
         config:
           urls:
             # - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions
-            - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions/latestView?pageNumber=544
+            - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions
           sourceFormat: text/turtle
           keep-state: true
           state: sqlite
@@ -70,7 +70,6 @@ orchestrator:
               ?o2NotBlank schema:opens ?fixedOpens .
               ?o2NotBlank schema:closes ?fixedCloses .
 
-              ?product foaf:test ?days .
             }
             WHERE {
               {
@@ -184,17 +183,76 @@ orchestrator:
                 OPTIONAL { ?o foaf:page      ?contactPage    }
                 OPTIONAL { ?o schema:email   ?contactEmail   }
                 OPTIONAL { ?o schema:telephone ?contactTelephone }
-                OPTIONAL { ?o schema:hoursAvailable ?contactOpeningsuren }
+
+
+
+                OPTIONAL {
+                  {
+                    SELECT ?o (GROUP_CONCAT(STR(?uuidStaticO2OpeningHours); SEPARATOR=', ') AS ?uuidStaticO2OpeningHoursCombined)
+                    WHERE {
+                      ?o schema:hoursAvailable ?o2 .
+                      ?o2 rdf:type schema:OpeningHoursSpecification .
+ 
+                      OPTIONAL{
+                      ?o2 schema:opens ?opens .
+                      }
+                      OPTIONAL{
+                      ?o2 schema:closes ?closes .
+                      }
+                      OPTIONAL{
+                      ?o2 schema:validFrom ?validFrom .
+                      }
+                      OPTIONAL{
+                      ?o2  schema:validThrough ?validThrough .
+                      }
+ 
+                      OPTIONAL {
+                        ?o2 schema:dayOfWeek ?dow .
+                        {
+                          SELECT ?product ?o2 (GROUP_CONCAT(STR(?dow); SEPARATOR=', ') AS ?days)
+                          WHERE {
+                            ?product schema:contactPoint/schema:hoursAvailable ?o2 .
+                            ?o2  rdf:type schema:OpeningHoursSpecification ;
+                              schema:dayOfWeek ?dow .
+                          }
+                          GROUP BY ?product ?o2
+                          ORDER BY ASC(?dow)
+                        }
+                        
+                      }
+ 
+                      BIND(
+                        MD5(
+                          CONCAT(
+                            COALESCE(STR(?product), 'blank-product'),
+                            COALESCE(STR(?opens), ''),
+                            COALESCE(STR(?closes), ''),
+                            COALESCE(STR(?validFrom), ''),
+                            COALESCE(STR(?validThrough), ''),
+                            COALESCE(MD5(STR(?days)), '')
+                          )
+                        )                   
+                        
+                        AS ?uuidStaticO2OpeningHours
+                      )
+                    }
+                    GROUP  BY ?o 
+                    ORDER BY ASC(?uuidStaticO2OpeningHours) 
+                  }                  
+                }
+
                 BIND(
-                MD5(
+                  MD5(
                     CONCAT(
                       COALESCE(STR(?contactPage),'ContactPoint-o1'),
                       COALESCE(STR(?contactEmail), ''),
                       COALESCE(STR(?contactTelephone),''),
-                      COALESCE(STR(?contactOpeningsuren), ''),
-                      COALESCE(STR(?parent),'empty-product-o1')
+                      COALESCE(STR(?parent),'empty-product-o1'),
+                      COALESCE(MD5(STR(?openinghoursConcat)), '')
+                      
                     )
                   )
+                  
                   AS ?uuidStatic
                 )
               }
