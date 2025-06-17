@@ -9,6 +9,14 @@ This repository provides a [JSON:API](http://jsonapi.org)-compatible interface t
 
 A quick start guide for using the JSON:API, which includes examples, is available [here](/getting_started.md).
 
+### Backward compatibility
+
+In order to be backward compatible when changing the API, we align with the Belgian Interoperability Framework on [preserving compatibility](https://www.belgif.be/specification/rest/api-guide/#preserving-compatibility).
+
+This means we prefer API evolution above versioning. We will introduce versioning (/v1) in our API links, but in practice this will not change in the short term and only when evolution is not possible.
+
+The list of fields that are added or deprecated can be found [here](/api_evolution.md).
+
 ### Starting the Service
 
 All components use Docker Compose. To start the stack, run:
