@@ -1,6 +1,6 @@
 # API evolution
 
-This page lists the fields in the API response that are deprecated enand new. 
+This page lists the fields in the API response that are deprecated and new. 
 
 We strive to only remove deprecated when all API users have migrated towards the new field.
 
