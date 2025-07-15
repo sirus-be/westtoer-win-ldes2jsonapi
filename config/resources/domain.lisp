@@ -229,7 +229,8 @@
                 (:omschrijving :language-string-set ,(s-prefix "schema:description"))
                 (:beste-score :string ,(s-prefix "schema:bestRating"))
                 (:slechtste-score :string ,(s-prefix "schema:worstRating"))
-                (:beoordeling-score :string ,(s-prefix "schema:ratingValue")))
+                (:beoordeling-score :string ,(s-prefix "schema:ratingValue"))
+                (:beoordelingsaspect :string ,(s-prefix "schema:reviewAspect")))
   :resource-base (s-url "https://data.westtoer.be/id/star-rating/")
   :on-path "beoordelingen")
 

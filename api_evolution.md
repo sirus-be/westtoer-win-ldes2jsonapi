@@ -4,8 +4,6 @@ This page lists the fields in the API response that are deprecated and new.
 
 We strive to only remove deprecated when all API users have migrated towards the new field.
 
-Currently (2025-06-17), no fields are deprecated or new.
-
 
 | Deprecated field   |    When removed | Migrate to field
 |----------|:-------------:|------:|
@@ -13,6 +11,6 @@ Currently (2025-06-17), no fields are deprecated or new.
 
 
 
-| New field   |    When introduced | Replaces deprecated field
-|----------|:-------------:|------:|
-| |  ||
+| New field   |    Path | Datatype |  Examples | When introduced | Replaces deprecated field
+|----------|:--------:|:-----:|-------:|--------:|------:|
+| beoordelingsaspect |  beoordelingen | String | "Classificatie", "Toegankelijkheid" | 2025-07-01 | Not applicable |
