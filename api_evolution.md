@@ -14,3 +14,4 @@ We strive to only remove deprecated when all API users have migrated towards the
 | New field   |    Path | Datatype |  Examples | When introduced | Replaces deprecated field
 |----------|:--------:|:-----:|-------:|--------:|------:|
 | beoordelingsaspect |  beoordelingen | String | "Classificatie", "Toegankelijkheid" | 2025-07-01 | Not applicable |
+| pref-label |  locaties | String | "Beschrijving van locatie" | 2025-10-01 | Not applicable |
