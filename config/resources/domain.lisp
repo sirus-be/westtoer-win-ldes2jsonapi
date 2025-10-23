@@ -63,6 +63,8 @@
                            :as "identificator")
              (address :via ,(s-prefix "locn:address")
                       :as "adres")
+             (location :via ,(s-prefix "datatourisme:isLocatedAt")
+                      :as "locatie")
              (geometry :via ,(s-prefix "locn:geometry")
                        :as "geometrie")
              (contact-point :via ,(s-prefix "schema:contactPoint")
@@ -134,6 +136,12 @@
 
     :resource-base (s-url "https://data.westtoer.be/id/address/")
     :on-path "adressen")
+
+(define-resource location ()
+  :class (s-prefix "terms:Location")
+  :properties `((:pref-label :language-string-set ,(s-prefix "core:prefLabel")))
+  :resource-base (s-url "https://data.westtoer.be/id/location/")
+  :on-path "locaties")
 
 
 (define-resource geometry ()
@@ -301,3 +309,4 @@
                 (:is-verwijderd :boolean ,(s-prefix "westtoer:isDeleted")))
   :resource-base (s-url "https://data.westtoer.be/id/label/")
   :on-path "labels")
+
