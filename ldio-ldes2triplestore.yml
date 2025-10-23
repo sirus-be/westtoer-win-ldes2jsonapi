@@ -595,10 +595,11 @@ orchestrator:
               }
               FILTER NOT EXISTS {
                 ?s skos:prefLabel ?o .
+                FILTER(contains(str(?s), \"https://data.westtoer.be/id/concepts/\") || contains(str(?s), \"https://data.westtoer.be/id/producttype/\")) .
               }
               FILTER NOT EXISTS {
                 ?s a logies:ToeristischeRegio .
-              }               
+              }            
             }
             "
 
