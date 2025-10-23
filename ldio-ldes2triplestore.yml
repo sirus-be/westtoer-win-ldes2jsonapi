@@ -20,7 +20,6 @@ orchestrator:
         name: Ldio:LdesClient
         config:
           urls:
-            # - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions
             - https://ca-westtoerwin-nginx-prod.livelyisland-1fa58ea1.westeurope.azurecontainerapps.io/touristattractions
           sourceFormat: text/turtle
           keep-state: true
@@ -33,6 +32,77 @@ orchestrator:
             max: 15
             statuses-to-retry: 403, 404
       transformers:
+        - name: Ldio:SparqlConstructTransformer
+          config:
+            query: |
+              PREFIX prov: <http://www.w3.org/ns/prov#>
+              PREFIX dcmitype: <http://purl.org/dc/dcmitype/>
+              PREFIX schema: <https://schema.org/>
+
+              CONSTRUCT {
+                ?request <http://www.w3.org/2011/http#url> ?url .
+
+                ?s ?p ?o .
+              } WHERE {
+                {
+                  ?product a dcmitype:Collection .
+                }
+                UNION
+                {
+                  ?product a schema:TouristAttraction .
+                }
+
+                ?s ?p ?o .
+
+                BIND(concat(
+                "http://database:8890/sparql?query=", 
+                  "PREFIX%20prov%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2Fns%2Fprov%23%3E%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20CONSTRUCT%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fproduct%20%3Chttps%3A%2F%2Fsirus.be%2Fns%23latestGeneratedAtTime%3E%20%3FgeneratedAtTime%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%20WHERE%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Fproduct%20prov%3AgeneratedAtTime%20%3FgeneratedAtTime%20.%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20VALUES%20%3Fproduct%20%7B%20%3C",
+                  encode_for_uri(str(?product)),
+                  "%3E%20%7D%20%7D"
+                ) as ?url)
+                BIND(URI(?url) as ?request)
+              }
+        - name: Ldio:HttpEnricher
+          config:
+            adapter:
+              name: Ldio:RdfAdapter
+            url-property-path: <http://www.w3.org/2011/http#url>
+            retries:
+              enabled: true
+              max: 10
+              statuses-to-retry: 410,451,500,400
+            rate-limit:
+              enabled: true
+              period: PT1M
+              limit: 100
+        - name: Ldio:SparqlConstructTransformer
+          config:
+            query: |
+              PREFIX prov: <http://www.w3.org/ns/prov#>
+              PREFIX dcmitype: <http://purl.org/dc/dcmitype/>
+              PREFIX schema: <https://schema.org/>
+              PREFIX sirus: <https://sirus.be/ns#>
+
+              CONSTRUCT {
+                ?s ?p ?o .
+              } WHERE {
+                {
+                  ?product a dcmitype:Collection .
+                }
+                UNION
+                {
+                  ?product a schema:TouristAttraction .
+                }
+                ?product prov:generatedAtTime ?generatedAtTime .
+
+                OPTIONAL { 
+                  ?product sirus:latestGeneratedAtTime ?latestGeneratedAtTime .
+                  FILTER (?generatedAtTime > ?latestGeneratedAtTime)
+                }                       
+
+                ?s ?p ?o .       
+                FILTER (?p NOT IN (sirus:latestGeneratedAtTime))
+              }
         - name: "Ldio:SparqlConstructTransformer"
           config:
             query: "
